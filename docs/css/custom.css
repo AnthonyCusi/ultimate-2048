@@ -14,7 +14,7 @@ body {
   width: 100%;
   /* Set the fixed height of the footer here */
   height: 60px;
-  background-color: #f5f5f5;
+  background-color: #faf8ef;
 }
 
 
@@ -27,6 +27,10 @@ body > .container {
 }
 .container .text-muted {
   margin: 20px 0;
+}
+
+h2 {
+  color: #776e65;
 }
 
 .footer > .container {
