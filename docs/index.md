@@ -5,7 +5,7 @@ title:  Home
 
 Ultimate 2048 aims to explore and compare the efficacy of various reinforcement learning (RL) algorithms in playing the game 2048, a puzzle game on a 4x4 grid where tiles of equal numbers are merged to create larger tiles until the 2048 tile is reached.
 
-<img src="images/2048gameplay.gif" alt="2048 gameplay gif" width="200"/>
+<img align="right" src="images/2048gameplay.gif" alt="2048 gameplay gif" width="200"/>
 
 <h3 style="color:#ebc02f;">
 Source Code:
@@ -25,4 +25,4 @@ Reports:
 Team:
 </h3>
 
-[Team](team.html)
+[Team Details](team.html)
