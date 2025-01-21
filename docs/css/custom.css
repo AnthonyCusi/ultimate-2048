@@ -3,11 +3,11 @@
 html {
   position: relative;
   min-height: 100%;
-  background-color: #faf8ef;
 }
 body {
   /* Margin bottom by footer height */
   margin-bottom: 60px;
+  background-color: #faf8ef;
 }
 .footer {
   position: absolute;
@@ -31,6 +31,10 @@ body > .container {
 
 h2 {
   color: #776e65;
+}
+
+h3 {
+  color: #E89A6C;
 }
 
 .footer > .container {
