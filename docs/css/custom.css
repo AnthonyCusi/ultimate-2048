@@ -3,6 +3,7 @@
 html {
   position: relative;
   min-height: 100%;
+  background-color: #faf8ef;
 }
 body {
   /* Margin bottom by footer height */
@@ -14,7 +15,6 @@ body {
   width: 100%;
   /* Set the fixed height of the footer here */
   height: 60px;
-  background-color: #faf8ef;
 }
 
 
@@ -24,7 +24,6 @@ body {
 
 body > .container {
   padding: 60px 15px 0;
-  background-color: #faf8ef;
 }
 .container .text-muted {
   margin: 20px 0;
