@@ -1,0 +1,21 @@
+{
+    "game": {
+        "grid_size": [4, 4],
+        "win_tile": 2048,
+        "spawn_tiles": {
+            "2": 0.9,
+            "4": 0.1
+        }
+    },
+    "display": {
+        "window_size": [600, 700],
+        "cell_padding": 2,
+        "font_size": 36
+    },
+    "colors": {
+        "background": [250, 248, 239],
+        "grid": [187, 173, 160],
+        "empty_cell": [205, 193, 180],
+        "text": [0, 0, 0]
+    }
+} 
