@@ -5,6 +5,7 @@
 import os
 import tensorflow as tf
 import random
+import models.baseline as baseline
 
 # Try multiple GPU configuration approaches to avoid memory issues and improve performance
 # os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
@@ -83,7 +84,7 @@ class AIGameGUI:
         
         # Load the AI model with progress bar
         self.show_progress("Loading AI model", 2, 4)
-        print("\nLoading TensorFlow model...")
+        #print("\nLoading TensorFlow model...")
         #self.model = tf.keras.models.load_model('models/2048_model_final.h5', 
         #                                      custom_objects={'custom_loss': 'categorical_crossentropy'})
         print("Model loaded successfully!")
@@ -114,12 +115,11 @@ class AIGameGUI:
         if current == total:
             sys.stdout.write('\n')
 
-    def get_ai_move(self):
+    def get_ai_move(self, model_to_use):
         # # Prepare the board state for the model
-        # state = self.game.board.copy()
+        #state = self.game.board.copy()
         # state = np.where(state > 0, np.log2(state), 0).astype(np.float32)
         # state = state / 11.0
-        
         # # Resize state to 4x4 for the model if necessary
         # if self.grid_size != [4, 4]:
         #     # Use max pooling to reduce larger boards to 4x4
@@ -152,29 +152,24 @@ class AIGameGUI:
         #         return move, prob
         
         # return None, 0
+        #moves = ['up', 'down', 'left', 'right']
 
-        # ----- Testing a random move model -----
-        # Plotting random values for predicition confidence
-        predictions = [random.uniform(0.5, 1), random.uniform(0.5, 1), random.uniform(0.5, 1), random.uniform(0.5, 1)]
-        self.update_network_visualization(predictions)
- 
-        moves = ['up', 'down', 'left', 'right']
-        # Choose a random order of moves 
-        random.shuffle(moves)
-        # Try moves in shuffled order
-        for move in moves:
-            # Create copy of game state
+        # Use the baseline model (selects random moves)
+        if model_to_use == 'b':
+            # Plotting random values for predicition confidence
+            predictions = [random.uniform(0.5, 1), random.uniform(0.5, 1), random.uniform(0.5, 1), random.uniform(0.5, 1)]
+            self.update_network_visualization(predictions)
+            # Get next move
             test_game = Game2048(config_dict=self.config)
             test_game.board = self.game.board.copy()
-            original = test_game.board.copy()
-            # Try move; if successful then return it
-            test_game.move(move)
-            if not np.array_equal(original, test_game.board):
-                return move, 1.0
-        # No more moves are possible; game over
-        return None, 0
-        # -----------------------------------------
-
+            return baseline.get_next_move(test_game, test_game.board)
+        elif model_to_use == 'm':
+            pass # TO DO 
+        else:
+            pass # TO DO
+        
+ 
+        
     def update_network_visualization(self, predictions):
         self.ax.clear()
         moves = ['Up', 'Down', 'Left', 'Right']
@@ -251,7 +246,7 @@ class AIGameGUI:
         
         pygame.display.flip()
 
-    def run(self):
+    def run(self, model_to_use):
         clock = pygame.time.Clock()
         running = True
         paused = False
@@ -271,7 +266,7 @@ class AIGameGUI:
                         self.move_delay = min(2000, self.move_delay + 100)
             
             if not paused and current_time - self.last_move_time >= self.move_delay:
-                move, confidence = self.get_ai_move()
+                move, confidence = self.get_ai_move(model_to_use)
                 
                 if move:
                     self.game.move(move)
@@ -292,4 +287,9 @@ class AIGameGUI:
 
 if __name__ == '__main__':
     game = AIGameGUI()
-    game.run()
+    print("----------------------------------------------")
+    model_to_use = input("Enter model to run ('b' for baseline, 'm' for mcts): ")
+    if model_to_use in ('b', 'm'):
+        game.run(model_to_use)
+    else:
+        print('Invalid model selected.')
