@@ -5,6 +5,7 @@
 import os
 import tensorflow as tf
 import random
+import copy
 import models.baseline as baseline
 import models.mcts as mcts
 
@@ -169,7 +170,7 @@ class AIGameGUI:
             predictions = [random.uniform(0.5, 1), random.uniform(0.5, 1), random.uniform(0.5, 1), random.uniform(0.5, 1)]
             self.update_network_visualization(predictions)
             # --- --- --- --- ---
-            test_game = Game2048(config_dict = self.config)
+            test_game = copy.deepcopy(self.game)
             mcts_model = mcts.MCTS()
             return mcts_model.search(test_game)
         else:

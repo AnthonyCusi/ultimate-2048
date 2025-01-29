@@ -14,9 +14,18 @@ class Node:
         self.visit_count = 0
         self.total_reward = 0
 
-    def best_child(self):
+    def best_child(self, exploration_weight = 1):
         '''Selects the node with the largest number of visits'''
-        return max(self.children, key = lambda x: x.visit_count)
+        try:
+            #return max(self.children, key = lambda x: x.visit_count)
+            return max(
+                self.children,
+                key = lambda child: child.total_reward / (child.visit_count + 1e-6) + \
+                exploration_weight * np.sqrt(np.log(self.visit_count + 1) / (child.visit_count + 1e-6))
+            )
+        except:
+            print(self.game_state.is_game_over())
+            return(self)
     
     def is_expanded(self):
         '''Returns bool based on if node is fully expanded'''
@@ -35,7 +44,7 @@ class Node:
     
 # Implements the Monte Carlo Tree Search Algorithm
 class MCTS:
-    def __init__(self, exploration_weight = 1, max_iterations = 5):
+    def __init__(self, exploration_weight = 1, max_iterations = 100):
         self.exploration_weight = exploration_weight
         self.max_iterations = max_iterations
 
@@ -48,13 +57,13 @@ class MCTS:
             self.backpropagate(node, reward)
         
         # Return move leading to the best next move
-        best_child = root.best_child()
+        best_child = root.best_child(exploration_weight = 0)
         return best_child.last_move, 1 # temporary 1 for confidence
     
     def select_next_move(self, node):
         '''Returns the next move from the current state'''
         while not node.game_state.is_game_over() and node.is_expanded():
-            node = node.best_child()
+            node = node.best_child(self.exploration_weight)
         if not node.game_state.is_game_over():
             return self.expand_node(node)
         return node
