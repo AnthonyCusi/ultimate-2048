@@ -6,6 +6,7 @@ import os
 import tensorflow as tf
 import random
 import models.baseline as baseline
+import models.mcts as mcts
 
 # Try multiple GPU configuration approaches to avoid memory issues and improve performance
 # os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
@@ -160,11 +161,17 @@ class AIGameGUI:
             predictions = [random.uniform(0.5, 1), random.uniform(0.5, 1), random.uniform(0.5, 1), random.uniform(0.5, 1)]
             self.update_network_visualization(predictions)
             # Get next move
-            test_game = Game2048(config_dict=self.config)
+            test_game = Game2048(config_dict = self.config)
             test_game.board = self.game.board.copy()
             return baseline.get_next_move(test_game, test_game.board)
         elif model_to_use == 'm':
-            pass # TO DO 
+            # --- TEMPORARY ---
+            predictions = [random.uniform(0.5, 1), random.uniform(0.5, 1), random.uniform(0.5, 1), random.uniform(0.5, 1)]
+            self.update_network_visualization(predictions)
+            # --- --- --- --- ---
+            test_game = Game2048(config_dict = self.config)
+            mcts_model = mcts.MCTS()
+            return mcts_model.search(test_game)
         else:
             pass # TO DO
         
