@@ -79,7 +79,7 @@ class Node:
     
 # Implements the Monte Carlo Tree Search Algorithm
 class MCTS:
-    def __init__(self, exploration_weight = 1, max_iterations = 20):
+    def __init__(self, exploration_weight = 1, max_iterations = 40):
         self.exploration_weight = exploration_weight
         self.max_iterations = max_iterations
 

@@ -10,31 +10,31 @@ import models.baseline as baseline
 import models.mcts as mcts
 
 # Try multiple GPU configuration approaches to avoid memory issues and improve performance
-# os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
-# os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 # Configure GPU memory growth
-# try:
-#     gpus = tf.config.experimental.list_physical_devices('GPU')
-#     if gpus:
-#         for gpu in gpus:
-#             tf.config.experimental.set_memory_growth(gpu, True)
-#             print(f"Memory growth enabled for GPU: {gpu}")
+try:
+    gpus = tf.config.experimental.list_physical_devices('GPU')
+    if gpus:
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
+            print(f"Memory growth enabled for GPU: {gpu}")
         
-#         # Set TensorFlow to use the GPU
-#         tf.config.set_visible_devices(gpus[0], 'GPU')
-#         print(f"Using GPU: {gpus[0]}")
+        # Set TensorFlow to use the GPU
+        tf.config.set_visible_devices(gpus[0], 'GPU')
+        print(f"Using GPU: {gpus[0]}")
         
-#         # Verify GPU is being used
-#         with tf.device('/GPU:0'):
-#             print("Testing GPU availability...")
-#             a = tf.constant([[1.0, 2.0], [3.0, 4.0]])
-#             b = tf.constant([[1.0, 2.0], [3.0, 4.0]])
-#             print("GPU test result:", tf.matmul(a, b))
-#     else:
-#         print("No GPU devices found!")
-# except Exception as e:
-#     print(f"Error configuring GPU: {str(e)}")
+        # Verify GPU is being used
+        with tf.device('/GPU:0'):
+            print("Testing GPU availability...")
+            a = tf.constant([[1.0, 2.0], [3.0, 4.0]])
+            b = tf.constant([[1.0, 2.0], [3.0, 4.0]])
+            print("GPU test result:", tf.matmul(a, b))
+    else:
+        print("No GPU devices found!")
+except Exception as e:
+    print(f"Error configuring GPU: {str(e)}")
 
 COLORS = {
     0: (205, 193, 180),
@@ -85,11 +85,11 @@ class AIGameGUI:
         self.font = pygame.font.Font(None, min(36, self.cell_size))
         
         # Load the AI model with progress bar
-        self.show_progress("Loading AI model", 2, 4)
+        #self.show_progress("Loading AI model", 2, 4)
         #print("\nLoading TensorFlow model...")
         #self.model = tf.keras.models.load_model('models/2048_model_final.h5', 
         #                                      custom_objects={'custom_loss': 'categorical_crossentropy'})
-        print("Model loaded successfully!")
+        #print("Model loaded successfully!")
         
         # Initialize visualization
         self.show_progress("Initializing visualization", 3, 4)
