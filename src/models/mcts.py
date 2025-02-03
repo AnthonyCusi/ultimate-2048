@@ -14,7 +14,7 @@ class Node:
         self.visit_count = 0
         self.total_reward = 0
 
-    def best_child(self, exploration_weight = 1):
+    def best_child(self, exploration_weight = 2.5):
         '''Selects the node with the largest number of visits'''
         try:
             #return max(self.children, key = lambda x: x.visit_count)
@@ -22,9 +22,10 @@ class Node:
                 self.children,
                 key = lambda child: child.total_reward / (child.visit_count + 1e-6) + \
                 exploration_weight * np.sqrt(np.log(self.visit_count + 1) / (child.visit_count + 1e-6))
-                - (100000 if child.last_move == "right" else 0)
+                - (120000 if child.last_move == "right" else 0)
                 - (20000 if child.last_move == "up" else 0)
-                - 100000 * self.distance_to_bottom_left(child.game_state.board)
+                - 100000 * self.distance_to_bottom_left(child.game_state.board
+                - 50000 * self.distance_to_second_bottom_left(child.game_state.board))
                 #+ 10000 * self.snake_score(child.game_state.board)
             )
         except:
@@ -37,6 +38,16 @@ class Node:
         max_pos = np.argwhere(board == np.max(board))[0]
         # Return the manhattan distance
         return abs(max_pos[0] - target_pos[0]) + abs(max_pos[1] - target_pos[1])
+    
+    def distance_to_second_bottom_left(self, board):
+        '''Calculates distance from 2nd largest tile to spot above bottom left corner'''
+        unique_values = np.unique(board)
+        second_largest_value = sorted(unique_values, reverse=True)[1]
+        second_largest_pos = np.argwhere(board == second_largest_value)[0]
+        target_pos = (len(board) - 2, 0)
+        # Manhattan distance    
+        return abs(second_largest_pos[0] - target_pos[0]) + abs(second_largest_pos[1] - target_pos[1])
+        
     
     def snake_pattern(self):
         '''Returns a list representing the ideal snake pattern'''
@@ -79,7 +90,7 @@ class Node:
     
 # Implements the Monte Carlo Tree Search Algorithm
 class MCTS:
-    def __init__(self, exploration_weight = 1, max_iterations = 40):
+    def __init__(self, exploration_weight = 2.5, max_iterations = 60):
         self.exploration_weight = exploration_weight
         self.max_iterations = max_iterations
 
@@ -139,7 +150,8 @@ class MCTS:
                 current_state.move(move)
                 reward += current_state.score
             steps += 1
-        # Using score as reward
+        # Using score and # of empty tiles as reward
+        reward += np.count_nonzero(current_state.board == 0) * 10
         return reward
     
     def backpropagate(self, node, reward):

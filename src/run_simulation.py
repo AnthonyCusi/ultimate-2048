@@ -204,11 +204,11 @@ class AIGameGUI:
         canvas = FigureCanvasAgg(self.fig)
         canvas.draw()
         renderer = canvas.get_renderer()
-        raw_data = renderer.tostring_rgb()
+        raw_data = renderer.tostring_argb()
         size = canvas.get_width_height()
         
         # Create pygame surface
-        surf = pygame.image.fromstring(raw_data, size, "RGB")
+        surf = pygame.image.fromstring(raw_data, size, "ARGB")
         scaled_surf = pygame.transform.smoothscale(surf, (500, 500))
 
         # Draw on screen
