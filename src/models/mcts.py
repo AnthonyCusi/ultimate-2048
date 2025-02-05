@@ -3,6 +3,7 @@
 import numpy as np
 import random
 import copy
+from concurrent.futures import ProcessPoolExecutor
 
 # Implements nodes that are part of the tree
 class Node:
@@ -14,7 +15,7 @@ class Node:
         self.visit_count = 0
         self.total_reward = 0
 
-    def best_child(self, exploration_weight = 2.5):
+    def best_child(self, exploration_weight = 2):
         '''Selects the node with the largest number of visits'''
         try:
             #return max(self.children, key = lambda x: x.visit_count)
@@ -24,8 +25,9 @@ class Node:
                 exploration_weight * np.sqrt(np.log(self.visit_count + 1) / (child.visit_count + 1e-6))
                 - (120000 if child.last_move == "right" else 0)
                 - (20000 if child.last_move == "up" else 0)
-                - 100000 * self.distance_to_bottom_left(child.game_state.board
-                - 50000 * self.distance_to_second_bottom_left(child.game_state.board))
+                - 100000 * self.distance_to_bottom_left(child.game_state.board)
+                - 100000 * self.distance_to_second_bottom_left(child.game_state.board)
+                # - 50000 * self.distance_to_third_bottom_left(child.game_state.board)
                 #+ 10000 * self.snake_score(child.game_state.board)
             )
         except:
@@ -48,7 +50,18 @@ class Node:
         # Manhattan distance    
         return abs(second_largest_pos[0] - target_pos[0]) + abs(second_largest_pos[1] - target_pos[1])
         
-    
+    # def distance_to_third_bottom_left(self, board):
+    #     '''Calculates distance from 3rd largest tile to 2 spots above bottom left corner'''
+    #     unique_values = np.unique(board)
+    #     try:
+    #         third_largest_value = sorted(unique_values, reverse=True)[2]
+    #         third_largest_pos = np.argwhere(board == third_largest_value)[0]
+    #         target_pos = (len(board) - 3, 0)
+    #         # Manhattan distance    
+    #         return abs(third_largest_pos[0] - target_pos[0]) + abs(third_largest_pos[1] - target_pos[1])
+    #     except:
+    #         return 0
+        
     def snake_pattern(self):
         '''Returns a list representing the ideal snake pattern'''
         indices = []
@@ -90,7 +103,7 @@ class Node:
     
 # Implements the Monte Carlo Tree Search Algorithm
 class MCTS:
-    def __init__(self, exploration_weight = 2.5, max_iterations = 60):
+    def __init__(self, exploration_weight = 2, max_iterations = 50):
         self.exploration_weight = exploration_weight
         self.max_iterations = max_iterations
 
@@ -141,7 +154,7 @@ class MCTS:
         current_state = copy.deepcopy(node.game_state)
         steps = 0
         reward = 0
-        while not current_state.is_game_over() and steps < 100:
+        while not current_state.is_game_over() and steps < 25:
             move = random.choice(node.possible_moves())
             # Penalize going right
             if move == "right":
@@ -151,7 +164,7 @@ class MCTS:
                 reward += current_state.score
             steps += 1
         # Using score and # of empty tiles as reward
-        reward += np.count_nonzero(current_state.board == 0) * 10
+        #reward += np.count_nonzero(current_state.board == 0) * 10
         return reward
     
     def backpropagate(self, node, reward):
