@@ -8,6 +8,7 @@ import random
 import copy
 import models.baseline as baseline
 import models.mcts as mcts
+import models.a2c as a2c
 
 # Try multiple GPU configuration approaches to avoid memory issues and improve performance
 os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
@@ -100,6 +101,7 @@ class AIGameGUI:
         self.last_move_time = pygame.time.get_ticks()
         self.moves_made = 0
         self.max_tile = 0
+        self.confidence = [0, 0, 0, 0]
         
         self.show_progress("Initialization complete!", 4, 4)
         print("\nReady to play! Press SPACE to pause/resume, UP/DOWN to control speed.")
@@ -173,6 +175,11 @@ class AIGameGUI:
             test_game = copy.deepcopy(self.game)
             mcts_model = mcts.MCTS()
             return mcts_model.search(test_game)
+        elif model_to_use == 'a':
+            self.update_network_visualization(self.confidence)
+            test_game = copy.deepcopy(self.game)
+            a2c_model = a2c.A2C()
+            return a2c_model.next_action(test_game)
         else:
             pass # TO DO
         
@@ -274,7 +281,7 @@ class AIGameGUI:
                         self.move_delay = min(2000, self.move_delay + 100)
             
             if not paused and current_time - self.last_move_time >= self.move_delay:
-                move, confidence = self.get_ai_move(model_to_use)
+                move, self.confidence = self.get_ai_move(model_to_use)
                 
                 if move:
                     self.game.move(move)
@@ -296,8 +303,8 @@ class AIGameGUI:
 if __name__ == '__main__':
     game = AIGameGUI()
     print("----------------------------------------------")
-    model_to_use = input("Enter model to run ('b' for baseline, 'm' for mcts): ")
-    if model_to_use in ('b', 'm'):
+    model_to_use = input("Enter model to run ('b' for baseline, 'm' for mcts, 'a' for a2c): ")
+    if model_to_use in ('b', 'm', 'a'):
         game.run(model_to_use)
     else:
         print('Invalid model selected.')
