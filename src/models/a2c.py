@@ -4,6 +4,7 @@
 import numpy as np
 import tensorflow as tf
 
+
 class A2C:
     def __init__(self):
 
@@ -40,10 +41,15 @@ class A2C:
     
     def next_action(self, game):
         '''Chooses next action by sampling from the actor network's output distribution'''
+
+        if game.is_game_over():
+            return None, 0
+        
         state = game.get_state()
         state = np.expand_dims(state, axis=0)
         probs = self.actor(state).numpy()[0]
         p = probs.tolist()
         action_idx = p.index(max(p))
-        print(self.moves[action_idx], p)
-        return self.moves[action_idx], probs
+        move = self.moves[action_idx]
+    
+        return move, probs
