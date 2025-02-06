@@ -183,6 +183,8 @@ class AIGameGUI:
             self.update_network_visualization(self.confidence)
             test_game = copy.deepcopy(self.game)
             a2c_model = a2c.A2C()
+            # train
+            a2c_model.train(test_game, num_episodes=50)
             return a2c_model.next_action(test_game)
         elif model_to_use == 'p':
             test_game = copy.deepcopy(self.game)

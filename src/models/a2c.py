@@ -3,6 +3,7 @@
 
 import numpy as np
 import tensorflow as tf
+import copy
 
 
 class A2C:
@@ -15,7 +16,6 @@ class A2C:
         self.actor = self.build_actor()
         self.critic = self.build_critic()
         
-        # will use these when I train the model
         self.actor_optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
         self.critic_optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
     
@@ -32,12 +32,10 @@ class A2C:
         '''Builds neural network for critic'''
         model = tf.keras.models.Sequential()
         model.add(tf.keras.layers.Input(shape=self.state_shape))
+        model.add(tf.keras.layers.Flatten())
         model.add(tf.keras.layers.Dense(32, activation='relu'))
         model.add(tf.keras.layers.Dense(1))
         return model
-    
-    def train(self):
-        '''Train the neural networks'''
     
     def next_action(self, game):
         '''Chooses next action by sampling from the actor network's output distribution'''
@@ -49,7 +47,37 @@ class A2C:
         state = np.expand_dims(state, axis=0)
         probs = self.actor(state).numpy()[0]
         p = probs.tolist()
-        action_idx = p.index(max(p))
+
+        # sample for exploration
+        action_idx = np.random.choice(len(self.moves), p=probs)
         move = self.moves[action_idx]
     
-        return move, probs
+        return move, p
+    
+    def train(self, game, num_episodes=1000):
+        '''Train the neural network'''
+
+        for episode in range(num_episodes):
+            # reset the current game state at the start of each episode
+            training_game = copy.deepcopy(game)
+            state = training_game.get_state()
+            state = np.expand_dims(state, axis=-1)
+            state = np.expand_dims(state, axis=0)
+            total_reward = 0
+            done = False
+
+            # get next move, probabilities from actor
+            move, probs = self.next_action(training_game)
+            if move is None:
+                break
+
+            old_score = training_game.score
+            # make move
+            training_game.move(move)
+            
+            # reward based on improvement
+            reward = training_game.score - old_score
+            total_reward += reward
+            
+            # get new state
+            next_state = training_game.get_state()
