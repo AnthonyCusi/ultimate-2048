@@ -1,6 +1,6 @@
+
 # This file implements the proximal policy optimization (PPO) approach
 # inspired by the implementation of PPO at https://iclr-blog-track.github.io/2022/03/25/ppo-implementation-details/
-
 import numpy as np
 import tensorflow as tf
 from keras import layers
@@ -60,8 +60,6 @@ class PPO:
         move = ['up', 'down', 'left', 'right'][action]
         return move, confidence
 
-
-
     def compute_advantages(self, rewards, values, next_value, dones):
         advantages = []
         gae = 0
@@ -73,7 +71,9 @@ class PPO:
         return np.array(advantages)
 
     def train(self, states, actions, old_probs, returns, advantages):
-        with tf.GradientTape() as tape1, tf.GradientTape() as tape2:
+        advantages = (advantages - tf.reduce_mean(advantages)) / (tf.math.reduce_std(advantages) + 1e-8)  # Normalize advantages
+
+        with tf.GradientTape(persistent=True) as tape:
             probs = self.actor(states)
             action_probs = tf.reduce_sum(probs * tf.one_hot(actions, self.action_space), axis=1)
 
@@ -81,16 +81,29 @@ class PPO:
             clipped_ratios = tf.clip_by_value(ratios, 1 - self.clip_ratio, 1 + self.clip_ratio)
 
             policy_loss = -tf.reduce_mean(tf.minimum(ratios * advantages, clipped_ratios * advantages))
-            value_loss = tf.reduce_mean(tf.square(returns - self.critic(states)))
+            entropy_bonus = tf.reduce_mean(-probs * tf.math.log(probs + 1e-10))  
+            value_loss = tf.reduce_mean(tf.keras.losses.Huber()(returns, self.critic(states)))  # Huber loss for stability
 
-            total_loss = policy_loss + 0.5 * value_loss
+            total_loss = policy_loss + 0.5 * value_loss - 0.01 * entropy_bonus 
 
-        actor_grads = tape1.gradient(policy_loss, self.actor.trainable_variables)
-        critic_grads = tape2.gradient(value_loss, self.critic.trainable_variables)
+        # Compute gradients based on total loss
+        actor_grads = tape.gradient(total_loss, self.actor.trainable_variables)  
+        critic_grads = tape.gradient(total_loss, self.critic.trainable_variables)  
 
+        # Apply gradients
         self.actor_optimizer.apply_gradients(zip(actor_grads, self.actor.trainable_variables))
         self.critic_optimizer.apply_gradients(zip(critic_grads, self.critic.trainable_variables))
 
+        del tape  # Free memory
+
+
+        
+    def custom_reward(self, board):
+        max_tile = np.max(board)
+        empty_tiles = np.sum(board == 0)
+        smoothness = -np.sum(np.abs(np.diff(np.sort(board.flatten()))))
+        return max_tile + 0.5 * empty_tiles + 0.1 * smoothness
+        
     def learn(self, game, episodes=1000, batch_size=64):
         for episode in range(episodes):
             state = game.get_state()
@@ -105,7 +118,10 @@ class PPO:
 
                 game.move(['up', 'down', 'left', 'right'][action])
                 next_state = game.get_state()
-                reward = np.max(game.board)
+                # reward = np.max(game.board)
+                reward = self.custom_reward(game.board)
+
+
                 done = game.is_game_over()
 
                 states.append(state)
@@ -124,3 +140,4 @@ class PPO:
             returns = advantages + np.array(values)
 
             self.train(np.array(states), np.array(actions), np.array(old_probs), np.array(returns), np.array(advantages))
+
