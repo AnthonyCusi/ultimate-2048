@@ -76,11 +76,11 @@ class A2C:
     
         return move, probs
     
-    def update(self, state, action_idx, reward, next_state, done):
+    def update(self, state, action_idx, reward, next_state):
         '''Update actor and critic'''
         
         # compute the target for the critic
-        next_value = 0 if done else self.critic(next_state)
+        next_value = self.critic(next_state)
         target = reward + self.gamma * next_value
 
         with tf.GradientTape(persistent=True) as tape_actor, tf.GradientTape(persistent=True) as tape_critic:
@@ -115,7 +115,6 @@ class A2C:
             state = np.expand_dims(state, axis=0)
             total_reward = 0
             count = 0
-            done = False # will implement later
 
             while count < 5:
                 # get next move, probabilities from actor
