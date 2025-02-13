@@ -29,13 +29,3 @@ Team
 </h3>
 
 Learn more about our team @ [Team Details](team.html)
-
-<h3 style="color:#eddfc9;">
-Resources
-</h3>
-
-The following resources were used by our team to better understand the algorithms we chose to implement.
-
-https://www.stephendiehl.com/posts/mtcs/ \
-https://iclr-blog-track.github.io/2022/03/25/ppo-implementation-details/ \
-https://www.geeksforgeeks.org/actor-critic-algorithm-in-reinforcement-learning/
