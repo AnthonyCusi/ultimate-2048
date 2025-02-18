@@ -11,16 +11,19 @@ Ultimate 2048 aims to explore and compare the efficacy of various reinforcement 
 ## Approach
 Our approach can be broken down into the implementation and evaluation of three different AI/ML Algorithms, which we evaluate under the same success criteria including the average maximum tile reached, average score achieved across a set of games, and the distribution of maximum tiles reached by each reinforcement learning algorithm.
 
-for each, write out:
+#### Monte Carlo Tree Search (MCTS)
 - algorithm summary
 - how it samples data
 - the equations of the loss(es) it optimizes
 - details about the approach as it applies to 2048, such as how you set up inputs and outputs (e.g. states/observations, actions, and rewards)
 - how much data you use (e.g. for how many interaction steps you train), and the values of any hyperparameters (cite sources)
 
-#### Monte Carlo Tree Search (MCTS)
-
 #### Proximal Policy Optimization (PPO)
+- algorithm summary
+- how it samples data
+- the equations of the loss(es) it optimizes
+- details about the approach as it applies to 2048, such as how you set up inputs and outputs (e.g. states/observations, actions, and rewards)
+- how much data you use (e.g. for how many interaction steps you train), and the values of any hyperparameters (cite sources)
 
 #### Advantage Actor-Critic (A2C)
 Actor-Critic algorithms are reinforcement learning algorithms that amalgamate both policy-based methods (which serve as the "Actor") and value-based methods (which serve as the "Critic").  Essentially, the Actor makes decisions while the Critic critiques them.  The "advantage" aspect of A2C occurs when an advantage function is included, which helps to determine how much better a decision by the Actor is in comparison to an "average" decision in the current state. (Geeks for Geeks)
@@ -32,9 +35,30 @@ Our A2C model optimizes the following loss equations:
 
 Our A2C model is very similar to our other two models in the way that it applies to 2048.  As stated above, our game state is a 4x4 grid represented as a Python array.  In order to make this compatible with neural networks for the Actor and Critic building step in this particular algorithm, we preprocess this grid into a (4,4,1) tensor.  The possible actions are the same for A2C as they are in all implementations of the 2048 game: up, down, left, right.  Like our other models, A2C returns an array representing the probability distribution over these moves.  This is done by our Actor neural network.  Rewards are given based on the increase in overall game score between moves.
 
-Finally, our A2C model uses several different data point in order to make its decisions.  At this point in time, we are messing around with training it for 5-50 episodes between each new move.  We are still learning how to use A2C for 2048, but ideally will have each episode train until the 2048 game is over.  We plan on implementing this before the final report.  While we are actively testing different values for them in order to produce more optimal results, our current hyperparameters are as follows: discount factor (gamma): 0.99 (we have seen this gamma rate used as common practice in several other RL contexts) ("The discount factor gamma is also a value between 0 and 1 but is typically kept high" (Oracle AI & Data Science Blog)), learning rate (Actor and Critic): 0.003 (we tested several different learning rates as this seemed to have the biggest affect on the score; at this point, 0.003 has resulted in the best performance).  Our video summary talks a bit more about this hyperparameter tuning.
+Finally, our A2C model uses several different data point in order to make its decisions.  At this point in time, we are messing around with training it for 5-50 episodes between each new move.  We are still learning how to use A2C for 2048, but ideally will have each episode train until the 2048 game is over.  We plan on implementing this before the final report.  While we are actively testing different values for them in order to produce more optimal results, our current hyperparameters are as follows: discount factor (gamma): 0.99 (we have seen this gamma rate used as common practice in several other RL contexts) ("The discount factor gamma is also a value between 0 and 1 but is typically kept high" (Oracle AI & Data Science Blog)), learning rate (Actor and Critic): 0.003 (we tested several different learning rates as this hyperparameter seemed to have the biggest affect on the score; at this point, 0.003 has resulted in the best performance).  Our evaluation section and video summary talk more about this hyperparameter tuning.
 
 ## Evaluation
+At this point in time, we are evaluating the success of our model's results based primarily on the score achieved by the end of the game.  While the average maximum tile reached is another significant point of data, this is factored into the score, and games can end with the same maximum tile and vastly different score.
+
+Thus, we used the game score to determine how to tune our models' hyperparameters.
+
+For MCTS, we determined through trial and error that tuning the maximum iterations of random plays made the biggest difference in score.  Thus, we focused on this hyperparameter.  After choosing 5 different potential values for max iterations: 10, 30, 60, 100, and 130, we ran the game 10x for each max iteration, then averaged the scores for each.  Our MCTS model performed best (average score of 10768.8) with max iterations set to 60.
+
+<img align="center" src="images/MCTSAvgScoreVaryingMaxIterations.png" alt="A2C Avg Score Varying Max Iterations" width="300"/>
+
+For PPO,
+
+*ppo hyperparam graph here*
+
+For A2C, we determined through trial and error that tuning the learning rate made the biggest difference in score.  Thus, we focused on this hyperparameter.  After choosing 5 different potential values for learning rate: 0.001, 0.003, 0.006, 0.01, and 0.013, we ran the game 10x for each learning rate, then averaged the scores for each.  Our A2C model performed best (average score of 984) with a learning rate of 0.003.
+
+<img align="center" src="images/A2CAvgScoreVaryingLearningRate.png" alt="A2C Avg Score Varying Learning Rate" width="300"/>
+
+We ran each of our models - MCTS, PPO, and A2C - as well as the randomized baseline, 10 times each with their respective best performing hyperparameters in order to determine which model is, at this time, best suited for the task of solving 2048.  The average scores are visable in the following table.
+
+*avg scores with best hyperparams table here*
+
+At this point in time, it appears that MCTS is by far the best suited RL algorithm for this particular problem.  While our PPO and A2C models are functional, they perform just around the baseline.
 
 ## Remaining Goals and Challenges
 At this point in time, only one of our three models has been able to reach the tile 2048.  This model, MCTS, is not able to achieve this score consistently.  Thus, while we are excited to reach this benchmark, we aim for it to no longer be a rare outcome.  Ideally, we want to reach 2048 with at least one of our models ~5% or more of the time.  Furthermore, we are still extremely far off from our moonshot of reaching the 4096 tile.  If we could hit this tile just once, we would consider our implementation a huge success.
