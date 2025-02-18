@@ -18,8 +18,8 @@ class A2C:
         self.actor = self.build_actor()
         self.critic = self.build_critic()
         
-        self.actor_optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
-        self.critic_optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
+        self.actor_optimizer = tf.keras.optimizers.Adam(learning_rate=0.003)
+        self.critic_optimizer = tf.keras.optimizers.Adam(learning_rate=0.003)
 
     def possible_moves(self):
         '''Returns possible moves from this game state'''

@@ -18,12 +18,12 @@ for each, write out:
 - details about the approach as it applies to 2048, such as how you set up inputs and outputs (e.g. states/observations, actions, and rewards)
 - how much data you use (e.g. for how many interaction steps you train), and the values of any hyperparameters (cite sources)
 
-### Monte Carlo Tree Search (MCTS)
+#### Monte Carlo Tree Search (MCTS)
 
-### Proximal Policy Optimization (PPO)
+#### Proximal Policy Optimization (PPO)
 
-### Advantage Actor-Critic (A2C)
-Actor-Critic algorithms are reinforcement learning algorithms that amalgamate both policy-based methods, which serve as the "Actor", and value-based methods, which serve as the "Critic".  Essentially, the Actor makes decisions while the Critic critiques them.  The "advantage" aspect of A2C occurs when an advantage function is included, which helps to determine how much better a decision by the Actor is in comparison to an "average" decision in the current state. (Geeks for Geeks)
+#### Advantage Actor-Critic (A2C)
+Actor-Critic algorithms are reinforcement learning algorithms that amalgamate both policy-based methods (which serve as the "Actor") and value-based methods (which serve as the "Critic").  Essentially, the Actor makes decisions while the Critic critiques them.  The "advantage" aspect of A2C occurs when an advantage function is included, which helps to determine how much better a decision by the Actor is in comparison to an "average" decision in the current state. (Geeks for Geeks)
 
 Our A2C model implementation samples data by taking in the current game state each time it is called to make a move.  This state is a Python array representing the current tiled 2048 board.  Given this game state, the actor returns the probability of success for each move.  Ideally, we would then sample over the probability distribution using np.random.choice.  However, we ran into an issue where our agent would pick a move that is not currently possible in the game state.  To alleviate this, we are currently choosing the move with the maximum probability of success of all current possible moves in the game state.  We plan on fixing this sampling issue before the final report.
 
