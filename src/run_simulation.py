@@ -84,6 +84,8 @@ class AIGameGUI:
         
         self.ppo_agent = ppo.PPO()
         self.ppo_agent.load_weights("src/__pycache__")
+        
+        self.a2c_model = a2c.A2C(self.game)
 
         
         self.cell_size = min(700 // max(self.grid_size), 50)
@@ -103,7 +105,7 @@ class AIGameGUI:
         self.fig, self.ax = plt.subplots(figsize=(4, 4))
         self.fig.patch.set_alpha(0.5)
         
-        self.move_delay = 500
+        self.move_delay = 50
         self.last_move_time = pygame.time.get_ticks()
         self.moves_made = 0
         self.max_tile = 0
@@ -184,8 +186,9 @@ class AIGameGUI:
         elif model_to_use == 'a':
             self.update_network_visualization(self.confidence)
             test_game = copy.deepcopy(self.game)
-            a2c_model = a2c.A2C()
-            return a2c_model.next_action(test_game)
+            # train
+            self.a2c_model.train(test_game, num_episodes=5)
+            return self.a2c_model.next_action(test_game)
         elif model_to_use == 'p':
             action, confidence = self.ppo_agent.select_action(self.game.get_state())
 
