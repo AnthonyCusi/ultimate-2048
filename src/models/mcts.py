@@ -15,7 +15,7 @@ class Node:
         self.visit_count = 0
         self.total_reward = 0
 
-    def best_child(self, exploration_weight = 2):
+    def best_child(self, exploration_weight = 1.5):
         '''Selects the node with the largest number of visits'''
         try:
             #return max(self.children, key = lambda x: x.visit_count)
@@ -103,7 +103,7 @@ class Node:
     
 # Implements the Monte Carlo Tree Search Algorithm
 class MCTS:
-    def __init__(self, exploration_weight = 2, max_iterations = 50):
+    def __init__(self, exploration_weight = 1.5, max_iterations = 60):
         self.exploration_weight = exploration_weight
         self.max_iterations = max_iterations
 
@@ -116,7 +116,7 @@ class MCTS:
             self.backpropagate(node, reward)
         
         # Return move leading to the best next move
-        best_child = root.best_child(exploration_weight = 0)
+        best_child = root.best_child(exploration_weight = 1.5)
         return best_child.last_move, 1 # temporary 1 for confidence
     
     def select_next_move(self, node):
@@ -154,7 +154,7 @@ class MCTS:
         current_state = copy.deepcopy(node.game_state)
         steps = 0
         reward = 0
-        while not current_state.is_game_over() and steps < 25:
+        while not current_state.is_game_over() and steps < 35:
             move = random.choice(node.possible_moves())
             # Penalize going right
             if move == "right":
