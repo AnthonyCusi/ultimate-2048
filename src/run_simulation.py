@@ -9,6 +9,7 @@ import copy
 import models.baseline as baseline
 import models.mcts as mcts
 import models.a2c as a2c
+import models.ppo as ppo
 
 # Try multiple GPU configuration approaches to avoid memory issues and improve performance
 os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
@@ -80,6 +81,13 @@ class AIGameGUI:
         self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption('2048 AI Player')
         self.game = Game2048(config_dict=self.config)
+        
+        self.ppo_agent = ppo.PPO()
+        self.ppo_agent.load_weights("src/__pycache__")
+        
+        self.a2c_model = a2c.A2C(self.game)
+
+        
         self.cell_size = min(700 // max(self.grid_size), 50)
         self.board_offset = ((400 - (self.cell_size * self.grid_size[0])) // 2,
                            (400 - (self.cell_size * self.grid_size[1])) // 2)
@@ -97,7 +105,7 @@ class AIGameGUI:
         self.fig, self.ax = plt.subplots(figsize=(4, 4))
         self.fig.patch.set_alpha(0.5)
         
-        self.move_delay = 500
+        self.move_delay = 50
         self.last_move_time = pygame.time.get_ticks()
         self.moves_made = 0
         self.max_tile = 0
@@ -178,8 +186,16 @@ class AIGameGUI:
         elif model_to_use == 'a':
             self.update_network_visualization(self.confidence)
             test_game = copy.deepcopy(self.game)
-            a2c_model = a2c.A2C()
-            return a2c_model.next_action(test_game)
+            # train
+            self.a2c_model.train(test_game, num_episodes=5)
+            return self.a2c_model.next_action(test_game)
+        elif model_to_use == 'p':
+            action, confidence = self.ppo_agent.select_action(self.game.get_state())
+
+            self.update_network_visualization([confidence if i == action else 0 for i in range(4)])
+            
+            move = ['up', 'down', 'left', 'right'][action]
+            return move, [confidence if i == action else 0 for i in range(4)]
         else:
             pass # TO DO
         
@@ -303,8 +319,8 @@ class AIGameGUI:
 if __name__ == '__main__':
     game = AIGameGUI()
     print("----------------------------------------------")
-    model_to_use = input("Enter model to run ('b' for baseline, 'm' for mcts, 'a' for a2c): ")
-    if model_to_use in ('b', 'm', 'a'):
+    model_to_use = input("Enter model to run ('b' for baseline, 'm' for mcts, 'a' for a2c, 'p' for ppo): ")
+    if model_to_use in ('b', 'm', 'a', 'p'):
         game.run(model_to_use)
     else:
         print('Invalid model selected.')

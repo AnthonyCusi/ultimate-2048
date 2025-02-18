@@ -1,0 +1,64 @@
+---
+layout: default
+title:  Status
+---
+
+## Video Summary
+
+## Project Summary
+Ultimate 2048 aims to explore and compare the efficacy of various reinforcement learning (RL) algorithms in playing the game 2048, which is a puzzle game on a 4x4 grid where tiles of equal numbers are merged to create larger tiles until the 2048 tile is reached. Tiles of values 2 and 4 appear at random in empty spaces on the grid. As there have been a variety of previous attempts across different contexts showing the surprising difficulty of this task, our focus is to (1) find and optimize an algorithm that can learn to reach the 2048 tile, and (2) perform a comparative analysis of Policy Gradient Algorithms - more specifically, Proximal Policy Optimization (PPO) and Advantage Actor-Critic (A2C) - and Monte Carlo Tree Search (MCTS) for this game under a single, controlled setting. We are using a Python implementation of the 2048 game in order to use a 2D array game state as input.  Each time the Python simulation calls the currently in-use model, the model's output consists of two parts: (1) one of four possible next moves: up, down, left, or right and (2) an array of length four with the model's confidence in each move at that particular point in time, expressed as a probability. By conducting this experiment, we hope to discover the strengths and weaknesses of each approach which can inform future studies regarding RL for solving complex puzzles involving randomness.
+
+## Approach
+Our approach can be broken down into the implementation and evaluation of three different AI/ML Algorithms, which we evaluate under the same success criteria.
+
+for each, write out:
+- algorithm summary
+- how it samples data
+- the equations of the loss(es) it optimizes
+- details about the approach as it applies to 2048, such as how you set up inputs and outputs (e.g. states/observations, actions, and rewards)
+- how much data you use (e.g. for how many interaction steps you train), and the values of any hyperparameters (cite sources)
+
+#### Monte Carlo Tree Search (MCTS)
+
+#### Proximal Policy Optimization (PPO)
+
+#### Advantage Actor-Critic (A2C)
+Actor-Critic algorithms are reinforcement learning algorithms that amalgamate both policy-based methods (which serve as the "Actor") and value-based methods (which serve as the "Critic").  Essentially, the Actor makes decisions while the Critic critiques them.  The "advantage" aspect of A2C occurs when an advantage function is included, which helps to determine how much better a decision by the Actor is in comparison to an "average" decision in the current state. (Geeks for Geeks)
+
+Our A2C model implementation samples data by taking in the current game state each time it is called to make a move.  This state is a Python array representing the current tiled 2048 board.  Given this game state, the actor returns the probability of success for each move.  Ideally, we would then sample over the probability distribution using np.random.choice.  However, we ran into an issue where our agent would pick a move that is not currently possible in the game state.  To alleviate this, we are currently choosing the move with the maximum probability of success of all current possible moves in the game state.  We plan on fixing this sampling issue before the final report.
+
+Our A2C model optimizes the following loss equations:
+?
+
+Our A2C model is very similar to our other two models in the way that it applies to 2048.  As stated above, our game state is a 4x4 grid represented as a Python array.  In order to make this compatible with neural networks for the Actor and Critic building step in this particular algorithm, we preprocess this grid into a (4,4,1) tensor.  The possible actions are the same for A2C as they are in all implementations of the 2048 game: up, down, left, right.  Like our other models, A2C returns an array representing the probability distribution over these moves.  This is done by our Actor neural network.  Rewards are given based on the increase in overall game score between moves.
+
+Finally, our A2C model uses several different data point in order to make its decisions.  At this point in time, we are messing around with training it for 5-50 episodes between each new move.  We are still learning how to use A2C for 2048, but ideally will have each episode train until the 2048 game is over.  We plan on implementing this before the final report.  While we are actively messing with them in order to produce better results, our starting hyperparameters are as follows: discount factor (gamma): 0.99 (we have seen this gamma rate used as common practice in several other RL contexts) ("The discount factor gamma is also a value between 0 and 1 but is typically kept high" (Oracle AI & Data Science Blog)), learning rate (Actor and Critic): 0.001 (used in all A2C implementations we've seen, notably in Geeks for Geeks CartPole implementation).
+
+## Evaluation
+
+## Remaining Goals and Challenges
+At this point in time, only one of our three models has been able to reach the tile 2048, which it is not able to achieve consistently.  While we are excited to reach this benchmark, it is still extremely far off from our moonshot of reaching the 4096 tile.
+
+That being said, all three of our RL models are reliably outperforming the baseline (which performs random moves on each turn).
+
+## Resources Used
+General Python Libraries: concurrent, copy, json, os, Pygame, random, sys
+
+AI/ML/Computing Libraries: Keras, Matplotlib, NumPy, TensorFlow
+
+2048 in Python:
+- Game Logic/Rendering (game_logic.py, game_renderer.py): https://github.com/scar17off/ai-2048
+- 2048 Python Game Simulation (run_simulation.py): Modified version of the original file "ai_play.py" in https://github.com/scar17off/ai-2048/tree/main
+
+Algorithm Implementation Approach:
+- Monte Carlo Tree Search (MCTS) approach (mcts.py): inspired by the implementation for Tic-Tac-Toe at https://www.stephendiehl.com/posts/mtcs/
+- Proximal Policy Optimization (PPO) approach (ppo.py): inspired by the implementation of PPO at https://iclr-blog-track.github.io/2022/03/25/ppo-implementation-details/
+- Advantage Actor-Critic (A2C) approach (a2c.py): inspired by the implementation for CartPole at https://www.geeksforgeeks.org/actor-critic-algorithm-in-reinforcement-learning/
+
+Other Resources:
+- https://blogs.oracle.com/ai-and-datascience/post/reinforcement-learning-q-learning-made-simple
+
+AI Tools:
+- Used ChatGPT in line with other online resources to gain a better understanding of the algorithms before implementation (i.e. had the chatbot summarize, give use case examples, etc.)
+- Used ChatGPT to aid in the fixing of minor bugs during implementation process
+
