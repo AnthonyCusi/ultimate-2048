@@ -83,6 +83,8 @@ class AIGameGUI:
         self.game = Game2048(config_dict=self.config)
         
         self.ppo_agent = ppo.PPO()
+        self.ppo_agent.load_weights("src/__pycache__")
+
         
         self.cell_size = min(700 // max(self.grid_size), 50)
         self.board_offset = ((400 - (self.cell_size * self.grid_size[0])) // 2,
@@ -185,9 +187,7 @@ class AIGameGUI:
             a2c_model = a2c.A2C()
             return a2c_model.next_action(test_game)
         elif model_to_use == 'p':
-            test_game = copy.deepcopy(self.game)
-            ppo_model = ppo.PPO()
-            action, confidence = ppo_model.select_action(test_game.get_state())
+            action, confidence = self.ppo_agent.select_action(self.game.get_state())
 
             self.update_network_visualization([confidence if i == action else 0 for i in range(4)])
             
