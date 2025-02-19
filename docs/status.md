@@ -32,11 +32,13 @@ Actor-Critic algorithms are reinforcement learning algorithms that amalgamate bo
 Our A2C model implementation samples data by taking in the current game state each time it is called to make a move.  This state is a Python array representing the current tiled 2048 board.  Given this game state, the actor returns the probability of success for each move.  Ideally, we would then sample over the probability distribution using np.random.choice.  However, we ran into an issue where our agent would pick a move that is not currently possible in the game state.  To alleviate this, we are currently choosing the move with the maximum probability of success of all current possible moves in the game state.  We plan on fixing this sampling issue before the final report.
 
 Our A2C model optimizes the following loss equation for the Actor by using the advantage function A(s, a).  (Equation via Medium.com)
+
 $$
 \mathcal{L}_{actor} = -E_{\pi_\theta} \left[ \log \pi_\theta(a | s) \cdot A(s, a) \right]
 $$
 
 Our A2C model optimizes the following loss equation for the Critic by minimizing the Mean Squared Error (MSE) between what is predicted and the target value (V). (Equation via Medium.com)
+
 $$
 \mathcal{L}_{critic} = \frac{1}{2} E \left[ \left( R_t + \gamma V(s_{t+1}) - V(s_t) \right)^2 \right]
 $$
@@ -113,7 +115,7 @@ AI/ML/Computing Libraries: Keras, Matplotlib, NumPy, TensorFlow
 - Game Logic/Rendering (game_logic.py, game_renderer.py): https://github.com/scar17off/ai-2048
 - 2048 Python Game Simulation (run_simulation.py): Modified version of the original file "ai_play.py" in https://github.com/scar17off/ai-2048/tree/main
 
-Algorithm Implementation Approach:
+Algorithm Implementation Approaches:
 - Monte Carlo Tree Search (MCTS) approach (mcts.py): inspired by the implementation for Tic-Tac-Toe at https://www.stephendiehl.com/posts/mtcs/
 - Proximal Policy Optimization (PPO) approach (ppo.py): inspired by the implementation of PPO at https://iclr-blog-track.github.io/2022/03/25/ppo-implementation-details/
 - Advantage Actor-Critic (A2C) approach (a2c.py): inspired by the implementation for CartPole at https://www.geeksforgeeks.org/actor-critic-algorithm-in-reinforcement-learning/
