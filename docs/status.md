@@ -47,11 +47,11 @@ Before we get into the way we evaluate our project, here's a little sneak peak i
 
 The gifs below provide a visual insight into the start, middle, and end of an example game.
 
-<img align="left" src="images/2048GameplayStart.gif" alt="2048 gameplay start gif" width="300"/>
 <div style="text-align: center;">
+<img src="images/2048GameplayStart.gif" alt="2048 gameplay start gif" width="300"/>
 <img src="images/2048GameplayMiddle.gif" alt="2048 gameplay middle gif" width="300"/>
+<img src="images/2048GameplayEnd.gif" alt="2048 gameplay end gif" width="300"/>
 </div>
-<img align="right" src="images/2048GameplayEnd.gif" alt="2048 gameplay end gif" width="300"/>
 
 At this point in time, we are evaluating the success of our model's results based primarily on the score achieved by the end of the game.  While the average maximum tile reached is another significant point of data, this is factored into the score, and games can end with the same maximum tile and vastly different score.
 
