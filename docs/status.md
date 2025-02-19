@@ -66,7 +66,7 @@ For MCTS, we determined through trial and error that tuning the maximum iteratio
 </div>
 
 #### Proximal Policy Optimization (PPO)
-For PPO,
+For PPO, we determined through trial and error that tuning the generalized advantage estimator (GAE) lambda made the biggest difference in score.  Thus, we focused on this hyperparameter.  After choosing 5 different potential values for GAE lambda: 0.90, 0.94, 0.95, 0.96, 0.99, we ran the game 10x for each GAE lambda, then averaged the scores for each.  Our PPO model performed best (average score of 1266) with a GAE lambda of 0.95.
 
 <div style="text-align: center;">
 <img src="images/PPOAvgScoreVaryingGAELambda.png" alt="A2C Avg Score Varying Learning Rate" width="300">
