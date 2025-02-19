@@ -48,7 +48,7 @@ Before we get into the way we evaluate our project, here's a little sneak peak i
 The gifs below provide a visual insight into the start, middle, and end of an example game.
 
 <img align="left" src="images/2048GameplayStart.gif" alt="2048 gameplay start gif" width="300"/>
-<img align="center" src="images/2048GameplayMiddle.gif" alt="2048 gameplay middle gif" width="300"/>
+<img class="center" src="images/2048GameplayMiddle.gif" alt="2048 gameplay middle gif" width="300"/>
 <img align="right" src="images/2048GameplayEnd.gif" alt="2048 gameplay end gif" width="300"/>
 
 At this point in time, we are evaluating the success of our model's results based primarily on the score achieved by the end of the game.  While the average maximum tile reached is another significant point of data, this is factored into the score, and games can end with the same maximum tile and vastly different score.
@@ -58,7 +58,7 @@ Thus, we used the game score to determine how to tune our models' hyperparameter
 #### Monte Carlo Tree Search (MCTS)
 For MCTS, we determined through trial and error that tuning the maximum iterations of random plays made the biggest difference in score.  Thus, we focused on this hyperparameter.  After choosing 5 different potential values for max iterations: 10, 30, 60, 100, and 130, we ran the game 10x for each max iteration, then averaged the scores for each.  Our MCTS model performed best (average score of 10768.8) with max iterations set to 60.
 
-<img align="center" src="images/MCTSAvgScoreVaryingMaxIterations.png" alt="A2C Avg Score Varying Max Iterations" width="300"/>
+<img class="center" src="images/MCTSAvgScoreVaryingMaxIterations.png" alt="A2C Avg Score Varying Max Iterations" width="300"/>
 
 #### Proximal Policy Optimization (PPO)
 For PPO,
@@ -68,7 +68,7 @@ For PPO,
 #### Advantage Actor-Critic (A2C)
 For A2C, we determined through trial and error that tuning the learning rate made the biggest difference in score.  Thus, we focused on this hyperparameter.  After choosing 5 different potential values for learning rate: 0.001, 0.003, 0.006, 0.01, and 0.013, we ran the game 10x for each learning rate, then averaged the scores for each.  Our A2C model performed best (average score of 984) with a learning rate of 0.003.
 
-<img align="center" src="images/A2CAvgScoreVaryingLearningRate.png" alt="A2C Avg Score Varying Learning Rate" width="300"/>
+<img class="center" src="images/A2CAvgScoreVaryingLearningRate.png" alt="A2C Avg Score Varying Learning Rate" width="300"/>
 
 #### Findings
 We ran each of our models - MCTS, PPO, and A2C - as well as the randomized baseline, 10 times each with their respective best performing hyperparameters in order to determine which model is, at this time, best suited for the task of solving 2048.  The average scores are visable in the following table.
