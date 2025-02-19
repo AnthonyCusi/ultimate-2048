@@ -38,22 +38,39 @@ Our A2C model is very similar to our other two models in the way that it applies
 Finally, our A2C model uses several different data point in order to make its decisions.  At this point in time, we are messing around with training it for 5-50 episodes between each new move.  We are still learning how to use A2C for 2048, but ideally will have each episode train until the 2048 game is over.  We plan on implementing this before the final report.  While we are actively testing different values for them in order to produce more optimal results, our current hyperparameters are as follows: discount factor (gamma): 0.99 (we have seen this gamma rate used as common practice in several other RL contexts) ("The discount factor gamma is also a value between 0 and 1 but is typically kept high" (Oracle AI & Data Science Blog)), learning rate (Actor and Critic): 0.003 (we tested several different learning rates as this hyperparameter seemed to have the biggest affect on the score; at this point, 0.003 has resulted in the best performance).  Our evaluation section and video summary talk more about this hyperparameter tuning.
 
 ## Evaluation
+Before we get into the way we evaluate our project, here's a little sneak peak into how we run our game and models:
+
+1. Run our run_simulation.py file with Python3.
+2. Choose which model we'd like to run the game on: "Enter model to run ('b' for baseline, 'm' for mcts, 'a' for a2c, 'p' for ppo)".
+3. Observe as our model runs on a game of 2048.
+4. View the output results in the terminal: the final score, the maximum tile, and the moves made.
+
+The gifs below provide a visual insight into the start, middle, and end of an example game.
+
+<img align="left" src="images/2048GameplayStart.gif" alt="2048 gameplay start gif" width="300"/>
+<img align="center" src="images/2048GameplayMiddle.gif" alt="2048 gameplay middle gif" width="300"/>
+<img align="right" src="images/2048GameplayEnd.gif" alt="2048 gameplay end gif" width="300"/>
+
 At this point in time, we are evaluating the success of our model's results based primarily on the score achieved by the end of the game.  While the average maximum tile reached is another significant point of data, this is factored into the score, and games can end with the same maximum tile and vastly different score.
 
 Thus, we used the game score to determine how to tune our models' hyperparameters.
 
+#### Monte Carlo Tree Search (MCTS)
 For MCTS, we determined through trial and error that tuning the maximum iterations of random plays made the biggest difference in score.  Thus, we focused on this hyperparameter.  After choosing 5 different potential values for max iterations: 10, 30, 60, 100, and 130, we ran the game 10x for each max iteration, then averaged the scores for each.  Our MCTS model performed best (average score of 10768.8) with max iterations set to 60.
 
 <img align="center" src="images/MCTSAvgScoreVaryingMaxIterations.png" alt="A2C Avg Score Varying Max Iterations" width="300"/>
 
+#### Proximal Policy Optimization (PPO)
 For PPO,
 
 *ppo hyperparam graph here*
 
+#### Advantage Actor-Critic (A2C)
 For A2C, we determined through trial and error that tuning the learning rate made the biggest difference in score.  Thus, we focused on this hyperparameter.  After choosing 5 different potential values for learning rate: 0.001, 0.003, 0.006, 0.01, and 0.013, we ran the game 10x for each learning rate, then averaged the scores for each.  Our A2C model performed best (average score of 984) with a learning rate of 0.003.
 
 <img align="center" src="images/A2CAvgScoreVaryingLearningRate.png" alt="A2C Avg Score Varying Learning Rate" width="300"/>
 
+#### Findings
 We ran each of our models - MCTS, PPO, and A2C - as well as the randomized baseline, 10 times each with their respective best performing hyperparameters in order to determine which model is, at this time, best suited for the task of solving 2048.  The average scores are visable in the following table.
 
 *avg scores with best hyperparams table here*
