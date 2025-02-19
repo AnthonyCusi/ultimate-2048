@@ -68,7 +68,9 @@ For MCTS, we determined through trial and error that tuning the maximum iteratio
 #### Proximal Policy Optimization (PPO)
 For PPO,
 
-*ppo hyperparam graph here*
+<div style="text-align: center;">
+<img src="images/PPOAvgScoreVaryingGAELambda.png" alt="A2C Avg Score Varying Learning Rate" width="300">
+</div>
 
 #### Advantage Actor-Critic (A2C)
 For A2C, we determined through trial and error that tuning the learning rate made the biggest difference in score.  Thus, we focused on this hyperparameter.  After choosing 5 different potential values for learning rate: 0.001, 0.003, 0.006, 0.01, and 0.013, we ran the game 10x for each learning rate, then averaged the scores for each.  Our A2C model performed best (average score of 984) with a learning rate of 0.003.
@@ -80,7 +82,9 @@ For A2C, we determined through trial and error that tuning the learning rate mad
 #### Findings
 We ran each of our models - MCTS, PPO, and A2C - as well as the randomized baseline, 10 times each with their respective best performing hyperparameters in order to determine which model is, at this time, best suited for the task of solving 2048.  The average scores are visable in the following table.
 
-*avg scores with best hyperparams table here*
+<div style="text-align: center;">
+<img src="images/AvgScoreAllModels.png" alt="A2C Avg Score Varying Max Iterations" width="400"/>
+</div>
 
 At this point in time, it appears that MCTS is by far the best suited RL algorithm for this particular problem.  While our PPO and A2C models are functional, they perform just around the baseline.
 
