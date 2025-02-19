@@ -31,8 +31,15 @@ Actor-Critic algorithms are reinforcement learning algorithms that amalgamate bo
 
 Our A2C model implementation samples data by taking in the current game state each time it is called to make a move.  This state is a Python array representing the current tiled 2048 board.  Given this game state, the actor returns the probability of success for each move.  Ideally, we would then sample over the probability distribution using np.random.choice.  However, we ran into an issue where our agent would pick a move that is not currently possible in the game state.  To alleviate this, we are currently choosing the move with the maximum probability of success of all current possible moves in the game state.  We plan on fixing this sampling issue before the final report.
 
-Our A2C model optimizes the following loss equations:
-?
+Our A2C model optimizes the following loss equation for the Actor by using the advantage function A(s, a).  (Equation via Medium.com)
+$$
+\mathcal{L}_{actor} = -E_{\pi_\theta} \left[ \log \pi_\theta(a | s) \cdot A(s, a) \right]
+$$
+
+Our A2C model optimizes the following loss equation for the Critic by minimizing the Mean Squared Error (MSE) between what is predicted and the target value (V). (Equation via Medium.com)
+$$
+\mathcal{L}_{critic} = \frac{1}{2} E \left[ \left( R_t + \gamma V(s_{t+1}) - V(s_t) \right)^2 \right]
+$$
 
 Our A2C model is very similar to our other two models in the way that it applies to 2048.  As stated above, our game state is a 4x4 grid represented as a Python array.  In order to make this compatible with neural networks for the Actor and Critic building step in this particular algorithm, we preprocess this grid into a (4,4,1) tensor.  The possible actions are the same for A2C as they are in all implementations of the 2048 game: up, down, left, right.  Like our other models, A2C returns an array representing the probability distribution over these moves.  This is done by our Actor neural network.  Rewards are given based on the increase in overall game score between moves.
 
@@ -113,6 +120,7 @@ Algorithm Implementation Approach:
 
 Other Resources:
 - https://blogs.oracle.com/ai-and-datascience/post/reinforcement-learning-q-learning-made-simple
+- https://medium.com/@dixitaniket76/advantage-actor-critic-a2c-algorithm-explained-and-implemented-in-pytorch-dc3354b60b50
 
 AI Tools:
 - Used ChatGPT in line with other online resources to gain a better understanding of the algorithms before implementation (i.e. had the chatbot summarize, give use case examples, etc.)
