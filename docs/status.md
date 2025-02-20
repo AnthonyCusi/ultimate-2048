@@ -32,11 +32,26 @@ To use this model in 2048, we represent states as a 4x4 array and define actions
 This setup allowed us to evaluate MCTS's performance for long-term decision making and compare it against other reinforcement-learning approaches for 2048.
 
 #### Proximal Policy Optimization (PPO)
-- algorithm summary
-- how it samples data
-- the equations of the loss(es) it optimizes
-- details about the approach as it applies to 2048, such as how you set up inputs and outputs (e.g. states/observations, actions, and rewards)
-- how much data you use (e.g. for how many interaction steps you train), and the values of any hyperparameters (cite sources)
+Proximal Policy Optimization (PPO) is a gradient method that seeks balance between improving policy and maintaining stability during updates. Instead of taking large policy updates that could destabilize training, PPO uses a clipped objective function that restricts how much the new policy can deviate from the old one. By limiting the probability ratio between new and old policies, we can show that PPO is robust and sample-efficient by constraining how much the new policy diverges. 
+In our implementation, the agent uses a log normalization (log₂) transformation to compress the range of tile values. The actor outputs a probability distribution over the 4 possible moves, and an action is sampled. The critic estimates the value of the state where each interaction produces a tuple (state, action, reward, next state and done flag) that is stored until the episode ends. We compute advantages and returns for updating the policy (actor) and value (critic) networks based on all interactions.
+
+PPO tries to improve the policy (the way the agent chooses actions) but restricts drastic changes between updates. This is done by comparing the new policy with the old policy using Policy Loss (Clipped Objective):
+$$
+L^{CLIP}(\theta) = \mathbb{E}_t\!\left[\min \Big( r_t(\theta)\hat{A}_t,\; \text{clip}\big(r_t(\theta),\,1-\epsilon,\,1+\epsilon\big)\hat{A}_t \Big) \right]
+$$
+The critic predicts the value of the expected future reward. We measure the difference between this value and the actual return (sum of rewards) using the Huber loss:
+$$
+L^{VF}(\theta) = \mathbb{E}_t\!\left[\text{Huber}\Big(V_\theta(s_t) - R_t\Big)\right]
+$$
+To encourage the agent to explore different actions rather than becoming too confident (or “certain”) about a single move, PPO adds an entropy bonus:
+$$
+L^{entropy}(\theta) = -\mathbb{E}_t\!\left[\pi_\theta(a_t \mid s_t)\log \pi_\theta(a_t \mid s_t)\right]
+$$
+The agent adjusts its policy to improve expected rewards (policy loss), learns to predict rewards accurately (value loss), and maintains a degree of exploration (entropy bonus). The total loss that PPO optimizes is a weighted sum of these three components:
+$$
+L(\theta) = L^{CLIP}(\theta) + 0.5\,L^{VF}(\theta) - 0.01\,L^{entropy}(\theta)
+$$
+The state is the 4×4 board normalized by applying $\log_2(\text{tile} + 1)$. Our custom reward function encourages moves that increase the maximum tile, create more empty spaces, and improve board smoothness, while penalizing non-progressive moves. The actor network outputs a probability distribution over these moves, and the critic estimates the expected return of the current state. In our experiments, we run 1000 episodes of interaction per training session. The key hyperparameters involve Gamma (Discount Factor): 0.99, Learning Rate: 0.0003, Clip Ratio (𝜖): 0.2, GAE Lambda: 0.95, based on Schulman et al. (2017) "Proximal Policy Optimization Algorithms." We also experiment by adjusting learning rates (.0001-.0003, .001) and GAE lambda (0.9-0.99) over several runs of 10 iterations to determine the best-performing combination. Average scores from GAE_lambda values had more drastic changes than those of learning_rate. 
 
 #### Advantage Actor-Critic (A2C)
 Actor-Critic algorithms are reinforcement learning algorithms that amalgamate both policy-based methods (which serve as the "Actor") and value-based methods (which serve as the "Critic").  Essentially, the Actor makes decisions while the Critic critiques them.  The "advantage" aspect of A2C occurs when an advantage function is included, which helps to determine how much better a decision by the Actor is in comparison to an "average" decision in the current state. (Geeks for Geeks)
