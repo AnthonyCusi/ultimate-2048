@@ -24,7 +24,7 @@ $$
 Q(s, a) represents exploitation (favoring high rewards), and the second term encourages exploration (prioritizing less-tried actions). On top of this, we want to ensure that the model keeps the largest tiles in the bottom left corner to keep the board organized. To do this, we first applied a heavy negative coefficient to actions moving right or up to discourage this behavior. Next, we created a distance function measuring how far the largests tile are to the corner with heavy penalties if this distance grows. Therefore, our final equation for selecting the best move from each rollout is:
 
 $$
-\mathcal{UCT}(s, a) = Q(s, a) + C \sqrt{\frac{\ln N(s)}{N(s, a)}} - 120000 \cdot (\text{move_right}) - 20000 \cdot (\text{move_up}) - 100000 \cdot (\text{dist_bottom_left}}
+\mathcal{UCT}(s, a) = Q(s, a) + C \sqrt{\frac{\ln N(s)}{N(s, a)}} - 120000 \cdot (\text{moveright}) - 20000 \cdot (\text{moveup}) - 100000 \cdot (\text{bottomleftdist}}
 $$
 
 To use this model in 2048, we represent states as a 4x4 array and define actions as the 4 possible moves. The reward function incentivizes tile merging and penalizes game termination. Instead of full rollouts, which can be hundreds of moves, we limited each to have a maximum of 35 steps as increasing the number had minimal benefits. We also optimized the number of trials/simulations by finding the average score of 10 games for 10, 30, 60, 100, and 130 simulations for each rollout. We found that using 60 simulations significantly outperformed other values. Additionally, we changed the exploration-expoitation tradeoff constant from 1 to 1.5 to slightly encourage more exploration before choosing the best move (Goenawan, et al. "What’s in a Game: Solving 2048 with Reinforcement Learning").
