@@ -15,12 +15,16 @@ Our approach can be broken down into the implementation and evaluation of three 
 #### Monte Carlo Tree Search (MCTS)
 Monte Carlo Tree Search is a search algorithm that balances exploration (trying new actions to discover long-term strategies) and exploitation (choosing the best-known action based on past experiences). The process follows 4 main steps: selection, expansion, simulation, and backpropagation. For 2048, MCTS constructs a search tree where nodes represent game states, and edges represent moves (up, down, left, right) linking those states. The algorithm iteratively simulates games from different starting points, updating its confidence in the different possible moves to maximize long-term success.
 
-MCTS samples game trajectories by simulating rollouts from the current state. At each step, it selects an action using Upper Confidence Bound for Trees (UCT) (chessprogramming.org). This is defined as $Q(s, a) + C \sqrt{\frac{\ln \mathcal{N}(s)}{\mathcal{N}(s, a)}}$, where Q(s, a) represents exploitation (favoring high rewards), and the second term encourages exploration (prioritizing less-tried actions). On top of this, we want to ensure that the model keeps the largest tiles in the bottom left corner to keep the board organized. To do this, we first applied a heavy negative coefficient to actions moving right or up to discourage this behavior. Next, we created a distance function measuring how far the largests tile are to the corner with heavy penalties if this distance grows. Therefore, our final equation for selecting the best move from each rollout is:
+MCTS samples game trajectories by simulating rollouts from the current state. At each step, it selects an action using Upper Confidence Bound for Trees (UCT) (chessprogramming.org). This is defined as:
+
 $$
-\mathcal{UCT}(s, a) = Q(s, a) + C \sqrt{\frac{\ln N(s)}{N(s, a)}}
-- 120000 \cdot \mathbb{1}(\text{move\_right})
-- 20000 \cdot \mathbb{1}(\text{move\_up})
-- 100000 \cdot d_{\text{bottom\_left}}
+\mathcal{UCT}(s, a) = Q(s, a)+ C \sqrt{\frac{\ln \mathcal{N}(s)}{\mathcal{N}(s, a)}}
+$$
+
+Q(s, a) represents exploitation (favoring high rewards), and the second term encourages exploration (prioritizing less-tried actions). On top of this, we want to ensure that the model keeps the largest tiles in the bottom left corner to keep the board organized. To do this, we first applied a heavy negative coefficient to actions moving right or up to discourage this behavior. Next, we created a distance function measuring how far the largests tile are to the corner with heavy penalties if this distance grows. Therefore, our final equation for selecting the best move from each rollout is:
+
+$$
+\mathcal{UCT}(s, a) = Q(s, a) + C \sqrt{\frac{\ln N(s)}{N(s, a)}} - 120000 \cdot \mathbb{1}(\text{move\_right}) - 20000 \cdot \mathbb{1}(\text{move\_up}) - 100000 \cdot d_{\text{bottom\_left}}
 $$
 
 To use this model in 2048, we represent states as a 4x4 array and define actions as the 4 possible moves. The reward function incentivizes tile merging and penalizes game termination. Instead of full rollouts, which can be hundreds of moves, we limited each to have a maximum of 35 steps as increasing the number had minimal benefits. We also optimized the number of trials/simulations by finding the average score of 10 games for 10, 30, 60, 100, and 130 simulations for each rollout. We found that using 60 simulations significantly outperformed other values. Additionally, we changed the exploration-expoitation tradeoff constant from 1 to 1.5 to slightly encourage more exploration before choosing the best move (Goenawan, et al. "What’s in a Game: Solving 2048 with Reinforcement Learning").
