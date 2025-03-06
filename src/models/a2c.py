@@ -36,8 +36,10 @@ class A2C:
         '''Builds neural network for actor'''
         model = tf.keras.models.Sequential()
         model.add(tf.keras.layers.Input(shape=self.state_shape))
+        model.add(tf.keras.layers.Conv2D(32, (2,2), activation='relu', padding='same'))
+        model.add(tf.keras.layers.Conv2D(64, (2,2), activation='relu', padding='same'))
         model.add(tf.keras.layers.Flatten())
-        model.add(tf.keras.layers.Dense(32, activation='relu'))
+        model.add(tf.keras.layers.Dense(64, activation='relu'))
         model.add(tf.keras.layers.Dense(len(self.moves), activation='softmax'))
         return model
     
@@ -45,8 +47,10 @@ class A2C:
         '''Builds neural network for critic'''
         model = tf.keras.models.Sequential()
         model.add(tf.keras.layers.Input(shape=self.state_shape))
+        model.add(tf.keras.layers.Conv2D(32, (2,2), activation='relu', padding='same'))
+        model.add(tf.keras.layers.Conv2D(64, (2,2), activation='relu', padding='same'))
         model.add(tf.keras.layers.Flatten())
-        model.add(tf.keras.layers.Dense(32, activation='relu'))
+        model.add(tf.keras.layers.Dense(64, activation='relu'))
         model.add(tf.keras.layers.Dense(1))
         return model
     
