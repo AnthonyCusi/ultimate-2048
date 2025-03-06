@@ -5,7 +5,6 @@ import numpy as np
 import tensorflow as tf
 import copy
 
-
 class A2C:
     def __init__(self, game):
 
@@ -72,12 +71,14 @@ class A2C:
             if self.all_moves[i]in self.moves:
                 probs_of_current_moves.append(probs[i])
 
-        # sample for exploration
-        # action_idx = np.random.choice(len(self.moves), p=fix_p(probs_of_current_moves))
-        # currently not sampling due to issue with probabilities not summing to 1
-        action_idx = probs_of_current_moves.index(max(probs_of_current_moves))
+        if np.isnan(probs_of_current_moves).any() or sum(probs_of_current_moves) == 0:
+            # if nan (numerical instability issues), then take max
+            action_idx = probs_of_current_moves.index(max(probs_of_current_moves))
+        else:
+            # otherwise, sample for exploration
+            action_idx = np.random.choice(len(self.moves), p=probs_of_current_moves / sum(probs_of_current_moves))
+        
         move = self.moves[action_idx]
-    
         return move, probs
     
     def update(self, state, action_idx, reward, next_state):
@@ -102,7 +103,7 @@ class A2C:
 
         # compute gradients and update networks
         actor_gradients = tape_actor.gradient(actor_loss, self.actor.trainable_variables)
-        critic_gradients = tape_actor.gradient(critic_loss, self.critic.trainable_variables)
+        critic_gradients = tape_critic.gradient(critic_loss, self.critic.trainable_variables)
 
         self.actor_optimizer.apply_gradients(zip(actor_gradients, self.actor.trainable_variables))
         self.critic_optimizer.apply_gradients(zip(critic_gradients, self.critic.trainable_variables))
