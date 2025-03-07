@@ -187,7 +187,7 @@ class AIGameGUI:
             self.update_network_visualization(self.confidence)
             test_game = copy.deepcopy(self.game)
             # train
-            self.a2c_model.train(test_game, num_episodes=5)
+            self.a2c_model.train(test_game, num_episodes=10)
             return self.a2c_model.next_action(test_game)
         elif model_to_use == 'p':
             action, confidence = self.ppo_agent.select_action(self.game.get_state())

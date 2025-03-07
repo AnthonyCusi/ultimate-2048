@@ -4,7 +4,6 @@
 import numpy as np
 import tensorflow as tf
 import copy
-
 class A2C:
     def __init__(self, game):
 
@@ -121,6 +120,7 @@ class A2C:
             total_reward = 0
             count = 0
 
+            # num of moves to make
             while count < 5:
                 # get next move, probabilities from actor
                 move, probs = self.next_action(training_game)
@@ -138,7 +138,6 @@ class A2C:
                 # reward based on improvement
                 reward = training_game.score - old_score
                 total_reward += reward
-                
 
                 # preprocess next_state in the same way as state
                 next_state_processed = np.expand_dims(next_state, axis=-1)

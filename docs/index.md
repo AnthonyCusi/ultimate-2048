@@ -22,7 +22,7 @@ The following reports were written by our team for CS 175: Project in AI during 
 
 - [Proposal](proposal.html)
 - [Status](status.html)
-- [Final](final.html)
+- [Final](final_report.html)
 
 <h3 style="color:#ee9769;">
 Team
