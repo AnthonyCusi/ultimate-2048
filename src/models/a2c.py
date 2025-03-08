@@ -97,7 +97,9 @@ class A2C:
             probs = self.actor(state)
 
             # compute actor and critic losses
-            actor_loss = -tf.math.log(probs[0, action_idx]) * advantage
+            entropy = -tf.reduce_sum(probs * tf.math.log(probs + 1e-10))
+            actor_loss = -tf.math.log(probs[0, action_idx]) * advantage - 0.01 * entropy
+
             critic_loss = tf.square(advantage)
 
         # compute gradients and update networks
@@ -121,7 +123,7 @@ class A2C:
             count = 0
 
             # num of moves to make
-            while count < 5:
+            while count < 10:
                 # get next move, probabilities from actor
                 move, probs = self.next_action(training_game)
                 if move is None:
