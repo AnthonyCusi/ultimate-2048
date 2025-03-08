@@ -24,11 +24,11 @@ class Node:
                 key = lambda child: child.total_reward / (child.visit_count + 1e-6) + \
                 exploration_weight * np.sqrt(np.log(self.visit_count + 1) / (child.visit_count + 1e-6))
                 - (120000 if child.last_move == "right" else 0)
-                - (20000 if child.last_move == "up" else 0)
+                - (40000 if child.last_move == "up" else 0)
                 - 100000 * self.distance_to_bottom_left(child.game_state.board)
                 - 100000 * self.distance_to_second_bottom_left(child.game_state.board)
                 # - 50000 * self.distance_to_third_bottom_left(child.game_state.board)
-                #+ 10000 * self.snake_score(child.game_state.board)
+                #+ 100000 * self.snake_score(child.game_state.board)
             )
         except:
             print(self.game_state.is_game_over())
@@ -162,6 +162,7 @@ class MCTS:
             else:
                 current_state.move(move)
                 reward += current_state.score
+                #reward += np.sum(current_state.board)
             steps += 1
         # Using score and # of empty tiles as reward
         #reward += np.count_nonzero(current_state.board == 0) * 10

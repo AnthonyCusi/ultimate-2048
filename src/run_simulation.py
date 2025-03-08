@@ -176,7 +176,7 @@ class AIGameGUI:
             test_game.board = self.game.board.copy()
             return baseline.get_next_move(test_game, test_game.board)
         elif model_to_use == 'm':
-            # --- TEMPORARY ---
+            # --- random probabilities ---
             predictions = [random.uniform(0.5, 1), random.uniform(0.5, 1), random.uniform(0.5, 1), random.uniform(0.5, 1)]
             self.update_network_visualization(predictions)
             # --- --- --- --- ---
@@ -197,7 +197,7 @@ class AIGameGUI:
             move = ['up', 'down', 'left', 'right'][action]
             return move, [confidence if i == action else 0 for i in range(4)]
         else:
-            pass # TO DO
+            pass
         
  
         
