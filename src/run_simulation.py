@@ -12,31 +12,31 @@ import models.a2c as a2c
 import models.ppo as ppo
 
 # Try multiple GPU configuration approaches to avoid memory issues and improve performance
-os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+# os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
+# os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
-# Configure GPU memory growth
-try:
-    gpus = tf.config.experimental.list_physical_devices('GPU')
-    if gpus:
-        for gpu in gpus:
-            tf.config.experimental.set_memory_growth(gpu, True)
-            print(f"Memory growth enabled for GPU: {gpu}")
+# # Configure GPU memory growth
+# try:
+#     gpus = tf.config.experimental.list_physical_devices('GPU')
+#     if gpus:
+#         for gpu in gpus:
+#             tf.config.experimental.set_memory_growth(gpu, True)
+#             print(f"Memory growth enabled for GPU: {gpu}")
         
-        # Set TensorFlow to use the GPU
-        tf.config.set_visible_devices(gpus[0], 'GPU')
-        print(f"Using GPU: {gpus[0]}")
+#         # Set TensorFlow to use the GPU
+#         tf.config.set_visible_devices(gpus[0], 'GPU')
+#         print(f"Using GPU: {gpus[0]}")
         
-        # Verify GPU is being used
-        with tf.device('/GPU:0'):
-            print("Testing GPU availability...")
-            a = tf.constant([[1.0, 2.0], [3.0, 4.0]])
-            b = tf.constant([[1.0, 2.0], [3.0, 4.0]])
-            print("GPU test result:", tf.matmul(a, b))
-    else:
-        print("No GPU devices found!")
-except Exception as e:
-    print(f"Error configuring GPU: {str(e)}")
+#         # Verify GPU is being used
+#         with tf.device('/GPU:0'):
+#             print("Testing GPU availability...")
+#             a = tf.constant([[1.0, 2.0], [3.0, 4.0]])
+#             b = tf.constant([[1.0, 2.0], [3.0, 4.0]])
+#             print("GPU test result:", tf.matmul(a, b))
+#     else:
+#         print("No GPU devices found!")
+# except Exception as e:
+#     print(f"Error configuring GPU: {str(e)}")
 
 COLORS = {
     0: (205, 193, 180),
@@ -128,44 +128,7 @@ class AIGameGUI:
             sys.stdout.write('\n')
 
     def get_ai_move(self, model_to_use):
-        # # Prepare the board state for the model
-        #state = self.game.board.copy()
-        # state = np.where(state > 0, np.log2(state), 0).astype(np.float32)
-        # state = state / 11.0
-        # # Resize state to 4x4 for the model if necessary
-        # if self.grid_size != [4, 4]:
-        #     # Use max pooling to reduce larger boards to 4x4
-        #     rows = np.array_split(state, 4, axis=0)
-        #     reduced_state = np.zeros((4, 4))
-        #     for i, row_group in enumerate(rows):
-        #         cols = np.array_split(row_group, 4, axis=1)
-        #         for j, block in enumerate(cols):
-        #             reduced_state[i, j] = np.max(block)
-        #     state = reduced_state
         
-        # state = state.reshape(1, 4, 4, 1)
-        
-        # # Get model predictions
-        # predictions = self.model.predict(state, verbose=0)[0]
-        # self.update_network_visualization(predictions)
-        
-        # # Map predictions to moves
-        # moves = ['up', 'down', 'left', 'right']
-        # move_probs = list(zip(moves, predictions))
-        # move_probs.sort(key=lambda x: x[1], reverse=True)
-        
-        # # Try moves in order of confidence until a valid one is found
-        # for move, prob in move_probs:
-        #     test_game = Game2048(config_dict=self.config)
-        #     test_game.board = self.game.board.copy()
-        #     original = test_game.board.copy()
-        #     test_game.move(move)
-        #     if not np.array_equal(original, test_game.board):
-        #         return move, prob
-        
-        # return None, 0
-        #moves = ['up', 'down', 'left', 'right']
-
         # Use the baseline model (selects random moves)
         if model_to_use == 'b':
             # Plotting random values for predicition confidence
@@ -187,7 +150,7 @@ class AIGameGUI:
             self.update_network_visualization(self.confidence)
             test_game = copy.deepcopy(self.game)
             # train
-            self.a2c_model.train(test_game, num_episodes=10)
+            self.a2c_model.train(test_game, num_episodes=3)
             return self.a2c_model.next_action(test_game)
         elif model_to_use == 'p':
             action, confidence = self.ppo_agent.select_action(self.game.get_state())
@@ -199,7 +162,6 @@ class AIGameGUI:
         else:
             pass
         
- 
         
     def update_network_visualization(self, predictions):
         self.ax.clear()

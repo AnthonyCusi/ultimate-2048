@@ -52,6 +52,32 @@ class A2C:
         model.add(tf.keras.layers.Dense(1))
         return model
     
+    def largest_tile_position_penalty(self, board):
+        '''Penalizes largest tile being further from bottom left corner'''
+        max_val = np.max(board)
+        max_pos = np.where(board == max_val)
+        
+        # check if the largest tile is in the bottom left
+        if len(max_pos[0]) > 0:
+            row, col = max_pos[0][0], max_pos[1][0]
+            
+            # Manhattan distance from ideal position
+            distance = abs(row - 3) + abs(col - 0)
+            
+            # higher penalty for greater distance
+            return -distance * 10000
+        return 0
+    
+    def second_largest_tile_position_penalty(self, board):
+        '''Penalizes 2nd largest tile being further from spot above bottom left corner'''
+        unique_values = np.unique(board)
+        second_largest_value = sorted(unique_values, reverse=True)[1]
+        second_largest_pos = np.argwhere(board == second_largest_value)[0]
+        target_pos = (len(board) - 2, 0)
+        # Manhattan distance    
+        return -(abs(second_largest_pos[0] - target_pos[0]) + abs(second_largest_pos[1] - target_pos[1])) * 5000
+
+    
     def next_action(self, game):
         '''Chooses next action by sampling from the actor network's output distribution'''
 
@@ -63,25 +89,53 @@ class A2C:
         state = game.get_state()
         state = np.expand_dims(state, axis=0)
         probs = self.actor(state).numpy()[0]
-
-        # get probabilities of current possible moves so only they can be chosen from
-        probs_of_current_moves = []
-        for i in range(len(self.all_moves)):
-            if self.all_moves[i]in self.moves:
-                probs_of_current_moves.append(probs[i])
-
-        if np.isnan(probs_of_current_moves).any() or sum(probs_of_current_moves) == 0:
-            # if nan (numerical instability issues), then take max
-            action_idx = probs_of_current_moves.index(max(probs_of_current_moves))
-        else:
-            # otherwise, sample for exploration
-            action_idx = np.random.choice(len(self.moves), p=probs_of_current_moves / sum(probs_of_current_moves))
         
-        move = self.moves[action_idx]
-        return move, probs
+        preferred_moves = []
+        
+        if 'down' in self.moves:
+            preferred_moves.append('down')
+        if 'left' in self.moves:
+            preferred_moves.append('left')
+        if preferred_moves:
+            move = preferred_moves[np.random.choice(len(preferred_moves))]
+            return move, probs
+        
+        # backup moves
+        if 'up' in self.moves:
+            move = 'up'
+            return move, probs
+        if 'right' in self.moves:
+            move = 'right'
+            return move, probs
+        
+        return self.moves[0], probs
+
+        # # get probabilities of current possible moves so only they can be chosen from
+        # probs_of_current_moves = []
+        # indices_of_current_moves = []
+        # for i in range(len(self.all_moves)):
+        #     if self.all_moves[i]in self.moves:
+        #         probs_of_current_moves.append(modified_probs[i])
+        #         indices_of_current_moves.append(i)
+
+        # if np.isnan(probs_of_current_moves).any() or sum(probs_of_current_moves) == 0:
+        #     # if nan (numerical instability issues), then take max
+        #     action_idx = probs_of_current_moves.index(max(probs_of_current_moves))
+        # else:
+        #     # otherwise, sample for exploration
+        #     normalized_probs = np.array(probs_of_current_moves) / sum(probs_of_current_moves)
+        #     action_idx = np.random.choice(len(self.moves), p=normalized_probs)
+        
+        # move = self.moves[action_idx]
+        # return move, probs
     
-    def update(self, state, action_idx, reward, next_state):
+    def update(self, state, action_idx, reward, next_state, game_board):
         '''Update actor and critic'''
+
+        # add penalty for largest tile being far from corner
+        position_reward = self.largest_tile_position_penalty(game_board)
+        position_reward += self.second_largest_tile_position_penalty(game_board)
+        reward += position_reward
         
         # compute the target for the critic
         next_value = self.critic(next_state)
@@ -98,7 +152,7 @@ class A2C:
 
             # compute actor and critic losses
             entropy = -tf.reduce_sum(probs * tf.math.log(probs + 1e-10))
-            actor_loss = -tf.math.log(probs[0, action_idx]) * advantage - 0.01 * entropy
+            actor_loss = -tf.math.log(probs[0, action_idx]) * advantage - 0.02 * entropy
 
             critic_loss = tf.square(advantage)
 
@@ -110,7 +164,7 @@ class A2C:
         self.critic_optimizer.apply_gradients(zip(critic_gradients, self.critic.trainable_variables))
 
 
-    def train(self, game, num_episodes=1000):
+    def train(self, game, num_episodes=100):
         '''Train the neural networks'''
 
         for episode in range(num_episodes):
@@ -139,7 +193,7 @@ class A2C:
                 
                 # reward based on improvement
                 reward = training_game.score - old_score
-                total_reward += reward
+                total_reward += 2 * reward
 
                 # preprocess next_state in the same way as state
                 next_state_processed = np.expand_dims(next_state, axis=-1)
@@ -148,7 +202,7 @@ class A2C:
                 action_idx = self.moves.index(move)
 
                 # update neural networks
-                self.update(state, action_idx, reward, next_state_processed)
+                self.update(state, action_idx, reward, next_state_processed, training_game.board)
 
                 # move to the next state
                 state = next_state_processed
