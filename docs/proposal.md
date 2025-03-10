@@ -18,4 +18,4 @@ Additionally, we will perform qualitative analysis by testing the algorithms on 
 We met with Professor Roy Fox on 1/17/25 to discuss our initial ideas and plan. Through this meeting, we learned about using Monte Carlo Tree Search (MCTS) and received advice about prioritizing "order" in the game state over immediately creating larger tiles.
 
 ## AI Tool Usage
-We did not use any AI tools to assist in writing this proposal or any code that was a part of this project. This section will be updated if we decide to utilize any AI tools at a later stage.
+We did not use any AI tools to assist in writing this proposal. Any future utilization of AI tools will be noted in the status/final reports.

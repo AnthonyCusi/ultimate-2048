@@ -27,8 +27,6 @@ class Node:
                 - (40000 if child.last_move == "up" else 0)
                 - 100000 * self.distance_to_bottom_left(child.game_state.board)
                 - 100000 * self.distance_to_second_bottom_left(child.game_state.board)
-                # - 50000 * self.distance_to_third_bottom_left(child.game_state.board)
-                #+ 100000 * self.snake_score(child.game_state.board)
             )
         except:
             print(self.game_state.is_game_over())
@@ -49,42 +47,6 @@ class Node:
         target_pos = (len(board) - 2, 0)
         # Manhattan distance    
         return abs(second_largest_pos[0] - target_pos[0]) + abs(second_largest_pos[1] - target_pos[1])
-        
-    # def distance_to_third_bottom_left(self, board):
-    #     '''Calculates distance from 3rd largest tile to 2 spots above bottom left corner'''
-    #     unique_values = np.unique(board)
-    #     try:
-    #         third_largest_value = sorted(unique_values, reverse=True)[2]
-    #         third_largest_pos = np.argwhere(board == third_largest_value)[0]
-    #         target_pos = (len(board) - 3, 0)
-    #         # Manhattan distance    
-    #         return abs(third_largest_pos[0] - target_pos[0]) + abs(third_largest_pos[1] - target_pos[1])
-    #     except:
-    #         return 0
-        
-    def snake_pattern(self):
-        '''Returns a list representing the ideal snake pattern'''
-        indices = []
-        for col in range(4):
-            column_indices = [(row, col) for row in range(4)]
-            if col % 2 == 0:
-                indices.reverse()  # Reverse every other column for snake-like traversal
-            indices.extend(column_indices)
-        return indices
-    
-    def snake_score(self, board):
-        '''Calculates the score for how well game is in snake pattern'''
-        snake_indices = self.snake_pattern()
-        flat_board = [(value, (i, j)) for i, row in enumerate(board) for j, value in enumerate(row)]
-        flat_board.sort(reverse=True, key=lambda x: x[0])
-        
-        score = 0
-        for (value, current), target in zip(flat_board, snake_indices):
-            # Manhattan distance between current and target position
-            dist = abs(current[0] - target[0]) + abs(current[1] - target[1])
-            score -= dist * value * 10000
-        return score
-
             
     def is_expanded(self):
         '''Returns bool based on if node is fully expanded'''
@@ -117,7 +79,7 @@ class MCTS:
         
         # Return move leading to the best next move
         best_child = root.best_child(exploration_weight = 1.5)
-        return best_child.last_move, 1 # temporary 1 for confidence
+        return best_child.last_move, 1
     
     def select_next_move(self, node):
         '''Returns the next move from the current state'''
@@ -162,10 +124,7 @@ class MCTS:
             else:
                 current_state.move(move)
                 reward += current_state.score
-                #reward += np.sum(current_state.board)
             steps += 1
-        # Using score and # of empty tiles as reward
-        #reward += np.count_nonzero(current_state.board == 0) * 10
         return reward
     
     def backpropagate(self, node, reward):
