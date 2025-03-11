@@ -12,7 +12,7 @@ The 2048 game is considerable AI/ML task because it has an enormous number of po
 
 We are using a Python implementation of the 2048 game in order to use a 2D array game state as input.  Each time the Python simulation calls the currently in-use model, the model's output consists of two parts: (1) one of four possible next moves: up, down, left, or right and (2) an array of length four with the model's confidence in each move at that particular point in time, expressed as a probability. By conducting this experiment, we hope to discover the strengths and weaknesses of each approach which can inform future studies regarding RL for solving complex, real-world problems involving randomness, spatial reasoning, and long-term planning.
 
-## Approach
+## Approaches
 Our approach can be broken down into the implementation and evaluation of three different AI/ML Algorithms, which we evaluate under the same success criteria. These models were selected because of their documented strengths in solving similar tasks [1-5], and refined through the recommendations of Professor Fox in our initial proposal meeting. We also implemented a baseline model to serve as a point of comparison.
 
 
@@ -107,7 +107,7 @@ for each episode:
 
 While it outperformed the baseline, A2C underperformed other models in 2048.
 
-A2C has many advantages in the world of reinforcement learning, most of which are applicable in the context of 2048.  It is able to train its actor and critic in parallel, which makes its training relatively fast and simple [10]. It is also able to continuously train in between each new move, preparing for more informed decisions in the long-term.  Furthermore, unlike our best performing algorithm, MCTS, A2C does not simulate a ton of possible futures, leading to a lower computational cost.
+A2C has many advantages in the world of reinforcement learning, most of which are applicable in the context of 2048.  It is able to train its actor and critic in parallel, which makes its training relatively fast and simple [10]. It is also able to continuously train in between each new move, preparing for more informed decisions in the long-term.  Furthermore, unlike our best performing algorithm, MCTS, A2C does not simulate a ton of possible futures, leading to a lower computational cost in that area.
 
 Despite the advantages (no pun intended) of utilizing A2C, the underperformance of this model is due to the simple fact that it is not suited for this particular task of solving 2048. The basis of A2C is to learn by experience. In a game as random as 2048, it is often better to rely on planning, which MCTS does well. A2C is also extremely sensitive to hyperparameters, and it is difficult to prevent overfitting when the training environment is so limited [9].  Throughout the tuning process of our A2C implementation, we found that adding more hidden layers, adding entropy to increase exploration, and continually testing and improving various hyperparameter values did not have nearly the effect on the resulting average scores that we assumed they would.  All of these changes caused our average score to go up from ~900 (as stated in our Progress Report) to around ~1100.  A measly increase after a lot of optimization.  It wasn't until we decided to prioritize organization - a strategy we also utilized with MCTS - by preferring to go down or left, that we were finally able to see an average score around ~2000.  However, this organization is not an inherent part of the A2C algorithm, and is something that we had to hard code in to work with the actor's decision process in order to see any improvement.
 
@@ -140,24 +140,31 @@ To evaluate game performance, we ran each optimized model on 30 full games each 
 
 An ANOVA test shows that there is a significant difference in the mean game scores across models, p < 0.0001. Specifically, a post-hoc Tukey's HSD test shows that MCTS performs significantly better on average than the baseline (p < 0.0001), PPO (p < 0.0001), and A2C (p < 0.0001). Although the PPO and A2C models appeared to outperform the baseline, these differences were not statistically significant (p = 0.08 and p = 0.69, respectively). With a mean score of 12,592, it is clear that MCTS is dominant in this game compared to the other models that we tested.
 
-In terms of the highest tile reached, only MCTS was able to reach the 2048 tile. This occurred in 3 out of the 30 games, or 10% of the time, which exceeds our original goal of 5%. Because of the massive state space and randomness of this task, we consider this model fairly successful. This result is also similar to the 11% win rate achieved by a previous study using an MCTS model with a comparable number of rollouts [1].
+In terms of the highest tile reached, only MCTS was ever able to reach the 2048 tile. This occurred in 3 out of the 30 games, or 10% of the time. This greatly exceeds our original goal of 5%. Because of the massive state space and randomness of this task, we consider this model to be fairly successful. The results we achieved are similar to the 11% win rate achieved by a previous study using an MCTS model with a comparable number of rollouts [1].
 
 
 #### Algorithm Speed
-Speed is not crucial to the 2048 game itself, but it serves as an important comparison of efficiency which may be a key factor for other similar reinforcement learning tasks. The plot below shows the number of moves made over time by each of the models. Time beyond 80 seconds is not shown, as the baseline, PPO, and A2C models would reach the 'game over' state before this.
+Speed is not crucial to the 2048 game itself, as there is no time limit in any standard implementation of the game. However, it does serve as an important comparison of efficiency which may be a key factor for other similar reinforcement learning tasks. The plot below shows the number of moves made over time by each of the models. Time beyond 80 seconds is not shown, as the baseline, PPO, and A2C models would reach the 'game over' state before this.
 
 <div style="text-align: center;">
 <img src="images/Moves_Per_Second.png" alt="comparison of moves made over time" width="400"/>
 </div>
 
-We see that PPO performs moves extremely quickly, and almost reaches the speed of the baseline which is selecting random moves. This made it very efficient for repeated testing and hyperparameter optimization, but in the case of 2048, the speed was not beneficial as the model did not get very far in the game. A2C and MCTS perform relatively similarly in terms of speed, taking much longer to make each move. For MCTS, this was caused by the algorithm perfoming many rollouts in order to find the next best move, and increasing the rollouts to even larger values results in *significantly* slowed gameplay. However, because this approach proves to be successful, the slower speed is a worthy cost for 2048. For A2C, which was both the slowest and worst performing model (excluding the baseline), we conclude that it may not be well-suited for this game.
+We see that PPO performs moves extremely quickly, and almost reaches the speed of the baseline which is selecting random moves. This made it very efficient for repeated testing and hyperparameter optimization, but in the case of 2048, the speed was not beneficial as the model did not get very far in the game. A2C and MCTS perform relatively similarly in terms of speed, taking much longer to make each move. For MCTS, this was caused by the algorithm perfoming many rollouts in order to find the next best move, and increasing the rollouts to even larger values results in *significantly* slowed gameplay. However, because this approach proves to be successful, the slower speed is a worthy cost for 2048. This may not be the case for other similar tasks. For A2C, the continuous training of both the actor and critic neural network resulted in a gameplay that is slightly slower than even MCTS.
 
-With more time, we would investigate more methods to improve the PPO model as it showed decent performance potential and unmatched speed, which can be very beneficial in other game environments.
+#### Summary and Takeaways
+
+A2C does not seem to be well-suited for this game. When compared to the other two reinforcement learning models - one of which is also a Policy Gradient Algorithm like A2C - it was both the slowest and worst performing model (excluding the baseline). The potential reasons for this are discussed in the A2C portion of our Approaches section of this report. With more time, we would like to investigate more methods to improve the PPO model as it showed decent performance potential and unmatched speed, which can be very beneficial in other game environments. MCTS is the clear winner of our analysis due to its unmatched ability to actually hit the 2048 tile.
+
+We rank our models on their ability to successfully play the game of 2048 as follows:
+
+1. MCTS: slow, scores ~12500 on average, and the only model to successfully reach 2048 (10% of the time)
+2. PPO: fast, scores ~3500 on average
+3. A2C: slow, scores ~2000 on average
+4. Baseline: makes random moves, scores ~1200 on average
  
 
-#### Strategies and Weaknesses
-
-## Resources Used
+## References
 Libraries:
 - General Python Libraries: concurrent, copy, json, os, Pygame, random, sys
 - AI/ML/Computing Libraries: Keras, Matplotlib, NumPy, TensorFlow
@@ -183,6 +190,6 @@ Referenced Papers and Resources:
 - [9] https://www.geeksforgeeks.org/actor-critic-algorithm-in-reinforcement-learning/
 - [10] https://schneppat.com/advantage-actor-critic_a2c.html
 
-AI Tools:
+## AI Tool Usage
 - Used ChatGPT in line with other online resources to gain a better understanding of the algorithms before implementation (i.e. had the chatbot summarize, give use case examples, etc.)
 - Used ChatGPT to aid in the fixing of minor bugs during implementation process
