@@ -24,7 +24,7 @@ class Node:
                 key = lambda child: child.total_reward / (child.visit_count + 1e-6) + \
                 exploration_weight * np.sqrt(np.log(self.visit_count + 1) / (child.visit_count + 1e-6))
                 - (120000 if child.last_move == "right" else 0)
-                - (40000 if child.last_move == "up" else 0)
+                - (20000 if child.last_move == "up" else 0)
                 - 100000 * self.distance_to_bottom_left(child.game_state.board)
                 - 100000 * self.distance_to_second_bottom_left(child.game_state.board)
             )

@@ -67,6 +67,9 @@ MCTS is found to significantly outperform other models in 2048 by simulating man
 #### Advantage Actor-Critic (A2C)
 
 ## Evaluation
+<div style="text-align: center;">
+<img src="images/scores.png" alt="distribution of scores by algorithm" width="400"/>
+</div>
 
 ## Resources Used
 Libraries:
