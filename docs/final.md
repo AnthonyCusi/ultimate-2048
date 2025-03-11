@@ -58,7 +58,7 @@ while game is not over:
     apply chosen move to game state        
 ```
 
-MCTS is found to significantly outperform other models in 2048 by simulating many rollouts to identify high-reward, long-term action sequences. However, this advantage comes with high computational costs. MCTS requires much more time per move than policy gradient methods, and the large tree growth relies on much more memory than other methods. In our optimal model using 60 simulations per rollout, the model only performs around 90 moves per minute compared to Proximal Policy Optimization which can perform over moves per minute. This makes it difficult to perform repeated testing as efficiently as other models, but because 2048 does not have a time limit and MCTS displays a high success rate, the computational cost is worth it. Additionally, with our penalties for making undesirable moves and creating a disorganized board, this model tends to make smart, long-term moves and does not show signs of overfitting.
+MCTS is found to significantly outperform other models in 2048 by simulating many rollouts to identify high-reward, long-term action sequences. However, this advantage comes with high computational costs. MCTS requires much more time per move than policy gradient methods, and the large tree growth relies on much more memory than other methods. In our optimal model using 60 simulations per rollout, the model only performs around 65 moves per minute compared to Proximal Policy Optimization which can perform almost 500 moves per minute. This makes it difficult to perform repeated testing as efficiently as other models, but because 2048 does not have a time limit and MCTS displays a high success rate, the computational cost is worth it. Additionally, with our penalties for making undesirable moves and creating a disorganized board, this model tends to make smart, long-term moves and does not show signs of overfitting.
 
 
 #### Proximal Policy Optimization (PPO)
@@ -67,9 +67,22 @@ MCTS is found to significantly outperform other models in 2048 by simulating man
 #### Advantage Actor-Critic (A2C)
 
 ## Evaluation
+We evaluate the models in the following ways to compare their strengths and weaknesses in the context of 2048. First, we use quantitative measures to compare the models' game scores and rate of reaching the 2048 tile. We also compare their speed by measuring how many moves are made at timed intervals. Then, we will use qualitative comparisons to demonstrate how the strategies of each model differ, and what challenges each one faces.
+
+#### Game Performance
+
 <div style="text-align: center;">
 <img src="images/Final_Scores.png" alt="distribution of scores by algorithm" width="400"/>
 </div>
+
+#### Algorithm Speed
+
+<div style="text-align: center;">
+<img src="images/Moves_per_Second.png" alt="comparison of moves made over time" width="400"/>
+</div>
+
+
+#### Strategies and Weaknesses
 
 ## Resources Used
 Libraries:
