@@ -69,16 +69,36 @@ MCTS is found to significantly outperform other models in 2048 by simulating man
 ## Evaluation
 We evaluate the models in the following ways to compare their strengths and weaknesses in the context of 2048. First, we use quantitative measures to compare the models' game scores and rate of reaching the 2048 tile. We also compare their speed by measuring how many moves are made at timed intervals. Then, we will use qualitative comparisons to demonstrate how the strategies of each model differ, and what challenges each one faces.
 
+This evaluation process followed these steps:
+1. Run the run_simulation.py file with Python3.
+2. Select which model we'd like to run the game on: ('b' for baseline, 'm' for mcts, 'a' for a2c, 'p' for ppo).
+3. Observe as our model runs on a full game of 2048.
+4. View the output results in the terminal: final score, maximum tile, and the number of moves made.
+
+The GIFs below provide a visual insight into the start, middle, and end of an example game.
+
+<div style="text-align: center;">
+<img src="images/2048GameplayStart.gif" alt="2048 gameplay start gif" width="300"/>
+<img src="images/2048GameplayMiddle.gif" alt="2048 gameplay middle gif" width="300"/>
+<img src="images/2048GameplayEnd.gif" alt="2048 gameplay end gif" width="300"/>
+</div>
+
 #### Game Performance
+To evaluate game performance, we ran each optimized model on 30 full games each and recorded the games' scores and highest tile reached. The distribution of scores for each model is shown in the box plots below.
 
 <div style="text-align: center;">
 <img src="images/Final_Scores.png" alt="distribution of scores by algorithm" width="400"/>
 </div>
 
+An ANOVA test shows that there is a significant difference in the mean game scores across models, p < 0.0001. Specifically, a post-hoc Tukey's HSD test shows that MCTS performs significantly better on average than the baseline (p < 0.0001), PPO (p < 0.0001), and A2C (p < 0.0001). Although the PPO and A2C models appeared to outperform the baseline, these differences were not statistically significant (p = 0.08 and p = 0.69, respectively). With a mean score of 12,592, it is clear that MCTS is dominant in this game compared to the other models that we tested.
+
+In terms of the highest tile reached, only MCTS was able to reach the 2048 tile. This occurred in 3 out of the 30 games, or 10% of the time, which exceeds our original goal of 5%. Because of the massive state space and randomness of this task, we consider this model fairly successful. This result is also similar to the 11% win rate achieved by a previous study using an MCTS model with a comparable number of rollouts [1].
+
+
 #### Algorithm Speed
 
 <div style="text-align: center;">
-<img src="images/Moves_per_Second.png" alt="comparison of moves made over time" width="400"/>
+<img src="images/Moves_Per_Second.png" alt="comparison of moves made over time" width="400"/>
 </div>
 
 
@@ -98,15 +118,15 @@ Algorithm Implementation Approaches:
 - Proximal Policy Optimization (PPO) approach (ppo.py): inspired by the implementation of PPO at https://iclr-blog-track.github.io/2022/03/25/ppo-implementation-details/
 - Advantage Actor-Critic (A2C) approach (a2c.py): inspired by the implementation for CartPole at https://www.geeksforgeeks.org/actor-critic-algorithm-in-reinforcement-learning/
 
-Papers and Other Resources:
+Referenced Papers and Resources:
 - [1] Goenawan, N., Tao, S., Wu, K. "What’s in a Game: Solving 2048 with Reinforcement Learning". https://web.stanford.edu/class/aa228/reports/2020/final41.pdf
 - [2] https://github.com/haakon8855/mcts-reinforcement-learning
 - [3] https://github.com/hsiehjackson/Deep-Reinforcement-Learning-on-Atari-Games
 - [4] https://njustesen.github.io/botbowl/a2c.html
 - [5] Guei, H. "On Reinforcement Learning for the Game of 2048". https://arxiv.org/abs/2212.11087
 - [6] https://www.chessprogramming.org/UCT
-- https://blogs.oracle.com/ai-and-datascience/post/reinforcement-learning-q-learning-made-simple
-- https://medium.com/@dixitaniket76/advantage-actor-critic-a2c-algorithm-explained-and-implemented-in-pytorch-dc3354b60b50
+- [7] https://blogs.oracle.com/ai-and-datascience/post/reinforcement-learning-q-learning-made-simple
+- [8] https://medium.com/@dixitaniket76/advantage-actor-critic-a2c-algorithm-explained-and-implemented-in-pytorch-dc3354b60b50
 
 AI Tools:
 - Used ChatGPT in line with other online resources to gain a better understanding of the algorithms before implementation (i.e. had the chatbot summarize, give use case examples, etc.)
