@@ -17,7 +17,7 @@ Our approach can be broken down into the implementation and evaluation of three 
 
 
 #### Baseline
-Our baseline model simply selects a random move (up, down, left, or right) for each turn. This strategy tends to succeed early in the game when the board is fairly empty and tiles' values are small. However, as the game progresses, random moves do not create any order on the board and thus fails. Therefore, this is a good baseline to check that our models are using long-term planning and reaching success in later stages of the game.
+Our baseline model simply selects a random move (up, down, left, or right) for each turn. This strategy tends to succeed early in the game when the board is fairly empty and tiles' values are small. However, as the game progresses, random moves do not create any order on the board and thus fails. Therefore, this is a reliable baseline to check that our models are using long-term planning and reaching success in later stages of the game.
 
 
 #### Monte Carlo Tree Search (MCTS)
@@ -65,6 +65,54 @@ MCTS is found to significantly outperform other models in 2048 by simulating man
 
 
 #### Advantage Actor-Critic (A2C)
+Actor-Critic algorithms are reinforcement learning algorithms that amalgamate both policy-based methods, which serve as the "actor", and value-based methods, which serve as the "critic". The actor makes decisions - in this case, which move should be played next in the game - while the critic critiques them, evaluating how beneficial each new move was to the overall gameplay or scenario. When the "advantage" piece is included, turning an Actor-Critic method into an Advantage Actor-Critic method, an advantage function works with the critic to help determine how much better a decision by the actor is in comparison to an "average" decision in the current state. [9]
+
+A2C samples data in our implementation by taking in the current game state each time it is called to make a move. This state is a Python array representing the current tiled 2048 board.Given this game state, the actor returns the probability of success for each move.
+
+In order to prioritize board organization, our A2C model prefers going down or left over going up or right.  After determining whether or not these preferred moves are available, our A2C model then samples over the probability distribution of the two of them using np.random.choice. This promotes exploration and helps the model perform better in the long-term.
+
+A2C optimizes the following loss equation for the actor by using the advantage function A(s, a). [8]
+
+$$
+\mathcal{L}_{actor} = -E_{\pi_\theta} \left[ \log \pi_\theta(a | s) \cdot A(s, a) \right]
+$$
+
+A2C optimizes the following loss equation for the critic by minimizing the Mean Squared Error (MSE) between what is predicted and the target value (V). [8]
+
+$$
+\mathcal{L}_{critic} = \frac{1}{2} E \left[ \left( R_t + \gamma V(s_{t+1}) - V(s_t) \right)^2 \right]
+$$
+
+Our A2C model is very similar to our other models in the way that it applies to 2048. As stated above, our game state is a 4x4 grid represented as a Python array. In order to make this compatible with the neural networks for the actor and critic building steps, we preprocess this grid into a (4,4,1) tensor. The possible actions are the same for A2C as they are in all implementations of the 2048 game: up, down, left, right. Like our other models, A2C returns an array representing the probability distribution over these moves. This is done by our actor neural network. Rewards are given based on the increase in overall game score between moves.
+
+A2C uses several different data points in order to make its decisions during 2048 gameplay. Each time it is called, it is fed in the current game state. It trains for 3 episodes between each new move.  Some of its notable hyperparameters are the discount factor (gamma), which we set to 0.99 [7] and the learning rate (for both the actor and critic), which we set to 0.003.  We tested several different learning rates as this hyperparameter has one of the biggest affects on the score, 0.003 has resulted in the best performance.
+
+In terms of our neural network architecture, the two convolutional layers have (1) 32 filters with a (2,2) kernel, ReLU activation, and 'same' padding and (2) 64 filters with a (2,2) kernel, ReLU activation, and 'same' padding.  The dense layers have a 64-neuron dense layer, with a different design on output layers for the actor and critic.  The actor has an output size equal to the number of moves (4), with softmax activation while the critic has a single output neuron for prediction. [9]
+
+The high-level pseudocode describing the flow of our A2C algorithm is shown below.
+```
+initialize actor and critic networks
+
+for each episode:
+    s = initial game state
+    while game is not over:
+        a = sample action from actor
+        execute action a in the game
+        calculate target
+        advantage = target - critic(s)
+        update actor loss: -log(prob(a|s)) * advantage - entropy
+        update critic loss: (advantage)²
+        s = new game state
+```
+
+While it outperformed the baseline, A2C underperformed other models in 2048.
+
+A2C has many advantages in the world of reinforcement learning, most of which are applicable in the context of 2048.  It is able to train its actor and critic in parallel, which makes its training relatively fast and simple. [10]  It is also able to continuously train in between each new move, preparing for more informed decisions in the long-term.  Furthermore, unlike our best performing algorithm, MCTS, A2C does not simulate a ton of possible futures, leading to a lower computational cost.
+
+Despite the advantages (no pun intended) of utilizing A2C, the underperformance of this model is due to the simple fact that it is not suited for this particular task of solving 2048.  The basis of A2C is to learn by experience.  In a game as random as 2048, it is often better to rely on planning, which MCTS does well.  A2C is also extremely sensitive to hyperparameters, and it is difficult to prevent overfitting when the training environment is so limited. [9]
+
+All in all, A2C certainly performs better than random moves on a very consistent basis, but it is not the ideal algorithm for 2048.
+
 
 ## Evaluation
 We evaluate the models in the following ways to compare their strengths and weaknesses in the context of 2048. First, we use quantitative measures to compare the models' game scores and rate of reaching the 2048 tile. We also compare their speed by measuring how many moves are made at timed intervals. Then, we will use qualitative comparisons to demonstrate how the strategies of each model differ, and what challenges each one faces.
@@ -132,6 +180,8 @@ Referenced Papers and Resources:
 - [6] https://www.chessprogramming.org/UCT
 - [7] https://blogs.oracle.com/ai-and-datascience/post/reinforcement-learning-q-learning-made-simple
 - [8] https://medium.com/@dixitaniket76/advantage-actor-critic-a2c-algorithm-explained-and-implemented-in-pytorch-dc3354b60b50
+- [9] https://www.geeksforgeeks.org/actor-critic-algorithm-in-reinforcement-learning/
+- [10] https://schneppat.com/advantage-actor-critic_a2c.html
 
 AI Tools:
 - Used ChatGPT in line with other online resources to gain a better understanding of the algorithms before implementation (i.e. had the chatbot summarize, give use case examples, etc.)
