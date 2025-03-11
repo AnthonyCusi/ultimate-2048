@@ -96,11 +96,16 @@ In terms of the highest tile reached, only MCTS was able to reach the 2048 tile.
 
 
 #### Algorithm Speed
+Speed is not crucial to the 2048 game itself, but it serves as an important comparison of efficiency which may be a key factor for other similar reinforcement learning tasks. The plot below shows the number of moves made over time by each of the models. Time beyond 80 seconds is not shown, as the baseline, PPO, and A2C models would reach the 'game over' state before this.
 
 <div style="text-align: center;">
 <img src="images/Moves_Per_Second.png" alt="comparison of moves made over time" width="400"/>
 </div>
 
+We see that PPO performs moves extremely quickly, and almost reaches the speed of the baseline which is selecting random moves. This made it very efficient for repeated testing and hyperparameter optimization, but in the case of 2048, the speed was not beneficial as the model did not get very far in the game. A2C and MCTS perform relatively similarly in terms of speed, taking much longer to make each move. For MCTS, this was caused by the algorithm perfoming many rollouts in order to find the next best move, and increasing the rollouts to even larger values results in *significantly* slowed gameplay. However, because this approach proves to be successful, the slower speed is a worthy cost for 2048. For A2C, which was both the slowest and worst performing model (excluding the baseline), we conclude that it may not be well-suited for this game.
+
+With more time, we would investigate more methods to improve the PPO model as it showed decent performance potential and unmatched speed, which can be very beneficial in other game environments.
+ 
 
 #### Strategies and Weaknesses
 
