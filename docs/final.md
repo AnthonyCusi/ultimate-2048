@@ -154,14 +154,22 @@ We see that PPO performs moves extremely quickly, and almost reaches the speed o
 
 #### Summary and Takeaways
 
-A2C does not seem to be well-suited for this game. When compared to the other two reinforcement learning models - one of which is also a Policy Gradient Algorithm like A2C - it was both the slowest and worst performing model (excluding the baseline). The potential reasons for this are discussed in the A2C portion of our Approaches section of this report. With more time, we would like to investigate more methods to improve the PPO model as it showed decent performance potential and unmatched speed, which can be very beneficial in other game environments. MCTS is the clear winner of our analysis due to its unmatched ability to actually hit the 2048 tile.
+In our proposal, we stated that we would explore and compare the efficacy of various reinforcement learning algorithms in playing the game 2048.
 
-We rank our models on their ability to successfully play the game of 2048 as follows:
+We can confidently say that A2C does not seem to be well-suited for this game. When compared to the other two RL models - one of which is also a Policy Gradient Algorithm like A2C - it was both the slowest and worst performing. The potential reasons for this are discussed in the A2C portion of the Approaches section of this report. In summary, its focus on learning by experience rather than planning paired with its sensitivity to hyperparameters makes A2C underperform in comparison to the efficacy of other RL algorithms.  While it is able to consistently surpass the baseline, the hugely slower speed of this algorithm makes even that accomplishment irrelevant in some environments.
+
+PPO, on the other hand, showed potential.  With more time, we would like to investigate more methods to improve the PPO model as it showed decent performance possibilities and unmatched speed, which can be very beneficial in other game environments. In the case of 2048, however, it barely surpasses A2C and comes no where near the achievement of MCTS.
+
+MCTS is the clear winner of our analysis due to its unmatched ability to actually hit the 2048 tile. As stated in the Game Performance section above, the capabilities of this model have doubled our original goal of hitting 2048 at a rate of 5%.
+
+All that in mind, we rank our models on their ability to successfully play the game of 2048 as follows:
 
 1. MCTS: slow, scores ~12500 on average, and the only model to successfully reach 2048 (10% of the time)
 2. PPO: fast, scores ~3500 on average
 3. A2C: slow, scores ~2000 on average
 4. Baseline: makes random moves, scores ~1200 on average
+
+In the future, we would find it interesting to implement more algorithms - perhaps including some that are not in the category of RL - to continue to evaluate what types of machine learning agents are suited for the suprisingly complex task of solving 2048.
  
 
 ## References
