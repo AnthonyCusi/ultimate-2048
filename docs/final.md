@@ -68,7 +68,7 @@ MCTS is found to significantly outperform other models in 2048 by simulating man
 
 ## Evaluation
 <div style="text-align: center;">
-<img src="images/scores.png" alt="distribution of scores by algorithm" width="400"/>
+<img src="images/Final_Scores.png" alt="distribution of scores by algorithm" width="400"/>
 </div>
 
 ## Resources Used
