@@ -65,19 +65,19 @@ MCTS is found to significantly outperform other models in 2048 by simulating man
 
 
 #### Advantage Actor-Critic (A2C)
-Actor-Critic algorithms are reinforcement learning algorithms that amalgamate both policy-based methods, which serve as the "actor", and value-based methods, which serve as the "critic". The actor makes decisions - in this case, which move should be played next in the game - while the critic critiques them, evaluating how beneficial each new move was to the overall gameplay or scenario. When the "advantage" piece is included, turning an Actor-Critic method into an Advantage Actor-Critic method, an advantage function works with the critic to help determine how much better a decision by the actor is in comparison to an "average" decision in the current state. [9]
+Actor-Critic algorithms are reinforcement learning algorithms that amalgamate both policy-based methods, which serve as the "actor", and value-based methods, which serve as the "critic". The actor makes decisions - in this case, which move should be played next in the game - while the critic critiques them, evaluating how beneficial each new move was to the overall gameplay or scenario. When the "advantage" piece is included, turning an Actor-Critic method into an Advantage Actor-Critic method, an advantage function works with the critic to help determine how much better a decision by the actor is in comparison to an "average" decision in the current state [9].
 
 A2C samples data in our implementation by taking in the current game state each time it is called to make a move. This state is a Python array representing the current tiled 2048 board.Given this game state, the actor returns the probability of success for each move.
 
 In order to prioritize board organization, our A2C model prefers going down or left over going up or right.  After determining whether or not these preferred moves are available, our A2C model then samples over the probability distribution of the two of them using np.random.choice. This promotes exploration and helps the model perform better in the long-term.
 
-A2C optimizes the following loss equation for the actor by using the advantage function A(s, a). [8]
+A2C optimizes the following loss equation for the actor by using the advantage function A(s, a) [8].
 
 $$
 \mathcal{L}_{actor} = -E_{\pi_\theta} \left[ \log \pi_\theta(a | s) \cdot A(s, a) \right]
 $$
 
-A2C optimizes the following loss equation for the critic by minimizing the Mean Squared Error (MSE) between what is predicted and the target value (V). [8]
+A2C optimizes the following loss equation for the critic by minimizing the Mean Squared Error (MSE) between what is predicted and the target value (V) [8].
 
 $$
 \mathcal{L}_{critic} = \frac{1}{2} E \left[ \left( R_t + \gamma V(s_{t+1}) - V(s_t) \right)^2 \right]
@@ -87,7 +87,7 @@ Our A2C model is very similar to our other models in the way that it applies to 
 
 A2C uses several different data points in order to make its decisions during 2048 gameplay. Each time it is called, it is fed in the current game state. It trains for 3 episodes between each new move.  Some of its notable hyperparameters are the discount factor (gamma), which we set to 0.99 [7] and the learning rate (for both the actor and critic), which we set to 0.003.  We tested several different learning rates as this hyperparameter has one of the biggest affects on the score, 0.003 has resulted in the best performance.
 
-In terms of our neural network architecture, the two convolutional layers have (1) 32 filters with a (2,2) kernel, ReLU activation, and 'same' padding and (2) 64 filters with a (2,2) kernel, ReLU activation, and 'same' padding.  The dense layers have a 64-neuron dense layer, with a different design on output layers for the actor and critic.  The actor has an output size equal to the number of moves (4), with softmax activation while the critic has a single output neuron for prediction. [9]
+In terms of our neural network architecture, the two convolutional layers have (1) 32 filters with a (2,2) kernel, ReLU activation, and 'same' padding and (2) 64 filters with a (2,2) kernel, ReLU activation, and 'same' padding.  The dense layers have a 64-neuron dense layer, with a different design on output layers for the actor and critic.  The actor has an output size equal to the number of moves (4), with softmax activation while the critic has a single output neuron for prediction [9].
 
 The high-level pseudocode describing the flow of our A2C algorithm is shown below.
 ```
@@ -95,7 +95,7 @@ initialize actor and critic networks
 
 for each episode:
     s = initial game state
-    while game is not over:
+    while training:
         a = sample action from actor
         execute action a in the game
         calculate target
@@ -107,11 +107,11 @@ for each episode:
 
 While it outperformed the baseline, A2C underperformed other models in 2048.
 
-A2C has many advantages in the world of reinforcement learning, most of which are applicable in the context of 2048.  It is able to train its actor and critic in parallel, which makes its training relatively fast and simple. [10]  It is also able to continuously train in between each new move, preparing for more informed decisions in the long-term.  Furthermore, unlike our best performing algorithm, MCTS, A2C does not simulate a ton of possible futures, leading to a lower computational cost.
+A2C has many advantages in the world of reinforcement learning, most of which are applicable in the context of 2048.  It is able to train its actor and critic in parallel, which makes its training relatively fast and simple [10]. It is also able to continuously train in between each new move, preparing for more informed decisions in the long-term.  Furthermore, unlike our best performing algorithm, MCTS, A2C does not simulate a ton of possible futures, leading to a lower computational cost.
 
-Despite the advantages (no pun intended) of utilizing A2C, the underperformance of this model is due to the simple fact that it is not suited for this particular task of solving 2048.  The basis of A2C is to learn by experience.  In a game as random as 2048, it is often better to rely on planning, which MCTS does well.  A2C is also extremely sensitive to hyperparameters, and it is difficult to prevent overfitting when the training environment is so limited. [9]
+Despite the advantages (no pun intended) of utilizing A2C, the underperformance of this model is due to the simple fact that it is not suited for this particular task of solving 2048. The basis of A2C is to learn by experience. In a game as random as 2048, it is often better to rely on planning, which MCTS does well. A2C is also extremely sensitive to hyperparameters, and it is difficult to prevent overfitting when the training environment is so limited [9].  Throughout the tuning process of our A2C implementation, we found that adding more hidden layers, adding entropy to increase exploration, and continually testing and improving various hyperparameter values did not have nearly the effect on the resulting average scores that we assumed they would.  All of these changes caused our average score to go up from ~900 (as stated in our Progress Report) to around ~1100.  A measly increase after a lot of optimization.  It wasn't until we decided to prioritize organization - a strategy we also utilized with MCTS - by preferring to go down or left, that we were finally able to see an average score around ~2000.  However, this organization is not an inherent part of the A2C algorithm, and is something that we had to hard code in to work with the actor's decision process in order to see any improvement.
 
-All in all, A2C certainly performs better than random moves on a very consistent basis, but it is not the ideal algorithm for 2048.
+All in all, A2C certainly performs better than random moves on a very consistent basis, but it is certainly not the ideal algorithm for 2048.
 
 
 ## Evaluation
