@@ -91,14 +91,7 @@ class AIGameGUI:
         self.cell_size = min(700 // max(self.grid_size), 50)
         self.board_offset = ((400 - (self.cell_size * self.grid_size[0])) // 2,
                            (400 - (self.cell_size * self.grid_size[1])) // 2)
-        self.font = pygame.font.Font(None, min(36, self.cell_size))
-        
-        # Load the AI model with progress bar
-        #self.show_progress("Loading AI model", 2, 4)
-        #print("\nLoading TensorFlow model...")
-        #self.model = tf.keras.models.load_model('models/2048_model_final.h5', 
-        #                                      custom_objects={'custom_loss': 'categorical_crossentropy'})
-        #print("Model loaded successfully!")
+        self.font = pygame.font.Font(None, min(36, self.cell_size))      
         
         # Initialize visualization
         self.show_progress("Initializing visualization", 3, 4)
@@ -128,7 +121,7 @@ class AIGameGUI:
             sys.stdout.write('\n')
 
     def get_ai_move(self, model_to_use):
-        
+
         # Use the baseline model (selects random moves)
         if model_to_use == 'b':
             # Plotting random values for predicition confidence
@@ -139,10 +132,8 @@ class AIGameGUI:
             test_game.board = self.game.board.copy()
             return baseline.get_next_move(test_game, test_game.board)
         elif model_to_use == 'm':
-            # --- random probabilities ---
-            predictions = [random.uniform(0.5, 1), random.uniform(0.5, 1), random.uniform(0.5, 1), random.uniform(0.5, 1)]
+            predictions = [random.uniform(0.5, 1), random.uniform(0.5, 1), random.uniform(0.5, 1), random.uniform(0.5, 1)] # Random probabilities
             self.update_network_visualization(predictions)
-            # --- --- --- --- ---
             test_game = copy.deepcopy(self.game)
             mcts_model = mcts.MCTS()
             return mcts_model.search(test_game)
