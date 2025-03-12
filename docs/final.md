@@ -62,7 +62,40 @@ MCTS is found to significantly outperform other models in 2048 by simulating man
 
 
 #### Proximal Policy Optimization (PPO)
+Proximal Policy Optimization is policy gradient method that combines the sample efficiency of on-policy algorithms with stable and reliable updates. PPO is known for clipping the objective function to prevent overly large policy updates, thus stabilizing training and avoiding performance drops. The core idea behind PPO is to prevent the policy update from moving too far in a single step, maintaining stable learning.
 
+$$
+\mathcal{L}^{\mathrm{CLIP}}(\theta) 
+= \mathbb{E}_t \Bigl[
+    \min\Bigl(
+        r_t(\theta)\,\hat{A}_t,
+        \,\mathrm{clip}\bigl(r_t(\theta),\,1-\epsilon,\,1+\epsilon\bigr)\,\hat{A}_t
+    \Bigr)
+\Bigr]
+$$
+
+where  $r_t(\theta) = \frac{\pi_\theta\bigl(a_t \mid s_t\bigr)}{\pi_{\theta_\mathrm{old}}\!\bigl(a_t \mid s_t\bigr)}$  is the probaility ratio of the new policy compared to the old policy.  $\hat{A}_t$ is an estimator of the advantage function at time t, and $\epsilon$ is a hyperparameter controlling the clipping range. For our 2048 game, PPO makes decisions by sampling from actor network's probability distribution over actions (up, down, left, right) at each move. Meanwhile, the critic network estimates the value of the current board state, helping PPO measure how beneficial each action might be in the long run. Similar to MCTS, we encourage moves that keep large tiles in the bottom-left corner and penalize unnecessary "up" and "right" moves, which helps enforce the heuristic of "keeping tiles in the corner". However, PPO doesn't simulate multiple future trajectories; it learns an optimal policy from repeated gameplay experience using gradient-based updates.
+
+We add an entropy bonus to encourage exploration, preventing the policy from converging prematurely to suboptimal actions. PPO doesn't search a large tree of possible futures, so it's able to execute nearly 500 moves per min. making it much faster to train and test repeatedly than tree-based methods. Our pseudocode can be demonstrated below:
+
+```
+initialize actor and critic networks
+
+for each episode:
+    s = initial game state
+    while game not over:
+        a ~ π_θ(a|s)               # sample action from actor's distribution
+        s', r = environment step   # environment returns next state and reward
+        advantage = r + γV(s') - V(s)
+        store (s, a, r, advantage, old_prob)
+        s = s'
+
+    # compute returns and advantages over entire episode
+    # update actor-critic parameters using clipped objective
+```
+One of the most impactful parameters was the learning rate, which we tested at 0.0003, 0.0001, and 0.00005. We found that 0.0003 led to the most stable training, while 0.0001 slowed down convergence but improved long-term stability, and 0.00005 was too slow, leading to suboptimal learning even after thousands of episodes. To balance exploration and exploitation, we implemented an exponential learning rate decay, allowing the agent to explore more aggressively in early training while refining its strategy as learning progressed. Another critical hyperparameter was Generalized Advantage Estimation (GAE) lambda, which controls the tradeoff between bias and variance in advantage estimation. We tested values of 0.8, 0.9, and 0.95, finding that 𝜆 = 0.95 produced the best results, as it allowed the agent to account for longer-term rewards without excessive variance in training updates. Lower values led to short-sighted decision-making, while 0.9 provided a reasonable middle ground but was still outperformed by 0.95 in maximizing high-value tile placements.
+
+We also tested different entropy coefficients (0.01, 0.05, 0.1) to encourage exploration. Initially, 0.1 caused too much randomness, preventing the agent from forming structured boards. 0.01 performed best, balancing exploration without deviating too much from an effective strategy. In addition, we adjusted reward scaling, testing both linear and exponential penalties for disorganized board states, and found that exponential penalties worked better in discouraging unnecessary up/right moves. Through these systematic hyperparameter adjustments, we improved PPO’s efficiency in structuring the board, maximizing tile merges, and maintaining organized play, making it a more effective solver for 2048.
 
 #### Advantage Actor-Critic (A2C)
 Actor-Critic algorithms are reinforcement learning algorithms that amalgamate both policy-based methods, which serve as the "actor", and value-based methods, which serve as the "critic". The actor makes decisions - in this case, which move should be played next in the game - while the critic critiques them, evaluating how beneficial each new move was to the overall gameplay or scenario. When the "advantage" piece is included, turning an Actor-Critic method into an Advantage Actor-Critic method, an advantage function works with the critic to help determine how much better a decision by the actor is in comparison to an "average" decision in the current state [9].
@@ -197,6 +230,7 @@ Referenced Papers and Resources:
 - [8] https://medium.com/@dixitaniket76/advantage-actor-critic-a2c-algorithm-explained-and-implemented-in-pytorch-dc3354b60b50
 - [9] https://www.geeksforgeeks.org/actor-critic-algorithm-in-reinforcement-learning/
 - [10] https://schneppat.com/advantage-actor-critic_a2c.html
+- [11] https://iclr-blog-track.github.io/2022/03/25/ppo-implementation-details/
 
 ## AI Tool Usage
 - Used ChatGPT in line with other online resources to gain a better understanding of the algorithms before implementation (i.e. had the chatbot summarize, give use case examples, etc.)
