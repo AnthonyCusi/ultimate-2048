@@ -4,6 +4,7 @@ title:  Final Report
 ---
 
 ## Final Video Summary
+<iframe width="560" height="315" src="https://www.youtube.com/embed/8rsbxtgB2kU?si=LqyvBAfQI5YXetQQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 ## Project Summary
 Ultimate 2048 aims to explore and compare the efficacy of various reinforcement learning (RL) algorithms in playing 2048: a puzzle game on a 4x4 grid where tiles of equal numbers are merged to create larger tiles indefinitely. While the game can technically go on forever, successfully reaching the 2048 tile is considered winning. Tiles of values 2 and 4 appear at random in empty spaces on the grid. If the board fills up and no additional moves are possible, the game is over. As there have been a variety of previous attempts across different contexts showing the surprising difficulty of this task, our focus is to (1) find and optimize an algorithm that can learn to reach the 2048 tile, and (2) perform a comparative analysis of Policy Gradient Algorithms - more specifically, Proximal Policy Optimization (PPO) and Advantage Actor-Critic (A2C) - and Monte Carlo Tree Search (MCTS) for this game under a single, controlled setting.
