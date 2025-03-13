@@ -79,19 +79,27 @@ where  $r_t(\theta) = \frac{\pi_\theta\bigl(a_t \mid s_t\bigr)}{\pi_{\theta_\mat
 We add an entropy bonus to encourage exploration, preventing the policy from converging prematurely to suboptimal actions. PPO doesn't search a large tree of possible futures, so it's able to execute nearly 500 moves per min. making it much faster to train and test repeatedly than tree-based methods. Our pseudocode can be demonstrated below:
 
 ```
-initialize actor and critic networks
+# initialize the actor and critic neural networks
 
-for each episode:
-    s = initial game state
-    while game not over:
-        a ~ π_θ(a|s)               # sample action from actor's distribution
-        s', r = environment step   # environment returns next state and reward
-        advantage = r + γV(s') - V(s)
-        store (s, a, r, advantage, old_prob)
-        s = s'
+for each training episode:
+    set initial game state
+    while the game is not over:
+        select an action based on the actor network's probability distribution
+        execute the action in the game environment
+        observe the new game state and the reward
+        compute the advantage estimate: 
+        store (game_state, action, reward, advantage_value, old_action_probability)
+        update the game state
 
-    # compute returns and advantages over entire episode
-    # update actor-critic parameters using clipped objective
+    # compute necessary values for training
+    compute advantage normalization, updated action probabilities, probability ratios with clipping,
+    policy loss (clipped surrogate objective), entropy bonus (to encourage exploration), 
+    value loss (using huber loss for stability), and total loss as a combination of policy, value, and entropy losses
+
+    # update the actor and critic networks using gradient descent
+    apply gradients to update actor network parameters
+    apply gradients to update critic network parameters
+
 ```
 One of the most impactful parameters was the learning rate, which we tested at 0.0003, 0.0001, and 0.00005. We found that 0.0003 led to the most stable training, while 0.0001 slowed down convergence but improved long-term stability, and 0.00005 was too slow, leading to suboptimal learning even after thousands of episodes. To balance exploration and exploitation, we implemented an exponential learning rate decay, allowing the agent to explore more aggressively in early training while refining its strategy as learning progressed. Another critical hyperparameter was Generalized Advantage Estimation (GAE) lambda, which controls the tradeoff between bias and variance in advantage estimation. We tested values of 0.8, 0.9, and 0.95, finding that 𝜆 = 0.95 produced the best results, as it allowed the agent to account for longer-term rewards without excessive variance in training updates. Lower values led to short-sighted decision-making, while 0.9 provided a reasonable middle ground but was still outperformed by 0.95 in maximizing high-value tile placements.
 
